@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:color="http://www.w3.org/1999/xhtml">
+<head>
+  <style>
+    #score {
+      font-weight: bold;
+      width:80%;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    #score div{
+      display: inline-block
+    }
+
+    .team-losing{
+      color: rgba(0, 0, 0, 0.4);
+    }
+
+    div#home-team{
+      width:110px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    #final-score{
+      width:60px;
+      text-align: center;
+    }
+
+    div#away-team{
+      width:110px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    th {
+      text-align: center;
+    }
+
+    .table-responsive .table {
+      width: 100%;
+      min-width: 600px; /* Adjust based on your content and layout */
+      min-height: 500px;
+    }
+
+    button{
+      border:none;
+      background:none
+    }
+
+<!-- -->
+  </style>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/8bab284c3d.js" crossorigin="anonymous"></script>
+  <title>Uaap Games</title>
+</head>
+<body>
+<div class="container">
+  <button th:onclick="location.href='http://localhost:8080/uaap-games'">
+    <h3 th:text="${'Season ' + uaapSeason.seasonNumber + ' - ' + uaapSeason.gameCode.gameName}"></h3>
+  </button>
+
+  <hr>
+  <form method="post">
+    <div>
+    <table class="table">
+      <thead>
+      <tr>
+        <th scope="col">Select</th>
+        <th scope="col">Game #</th>
+        <th scope="col">Result</th>
+        <th scope="col">Schedule</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr th:if="${#lists.isEmpty(uaapSeason.uaapGames)}">
+        <td colspan="6" class="text-center">No Data</td>
+      </tr>
+      <tr th:each="game: ${uaapSeason.uaapGames}">
+        <td>
+          <input type="checkbox" name="selections" th:value="${game.id}" class="form-check-info" >
+        </td>
+        <th scope="row" th:text="${game.gameNumber}">1</th>
+        <td th:with="homeTeam=${game.gameResults.get(0)}, awayTeam=${game.gameResults.get(1)}">
+          <div th:with="isHomeLost=${homeTeam.finalScore < awayTeam.finalScore}" id="score">
+
+            <div id = "home-team" class="team logo" th:classappend="${isHomeLost} ? 'team-losing'">
+              <img class="mx-2" th:src="@{/uaap-games/images/{filename}(filename = ${homeTeam.univ.univCode})}" height="32px" width="32px">
+              <div th:text="${homeTeam.univ.univCode}"></div>
+            </div>
+
+            <div id="final-score">
+              <div th:text="${homeTeam.finalScore}" th:classappend="${isHomeLost} ? 'team-losing'"></div>
+              <div id="separator"> - </div>
+              <div th:text="${awayTeam.finalScore}" th:classappend="${!isHomeLost} ? 'team-losing'"></div>
+            </div>
+
+            <div id = "away-team" class="team logo" th:classappend="${!isHomeLost} ? 'team-losing'">
+                <div th:text="${awayTeam.univ.univCode}"></div>
+              <img class="mx-2" th:src="@{/uaap-games/images/{filename}(filename = ${awayTeam.univ.univCode})}" height="32px" width="32px">
+            </div>
+          </div>
+        </td>
+        <td th:text="${game.venue + ', ' +{game.gameSched}}"></td>
+      </tr>
+      </tbody>
+    </table>
+    </div>
+    <button type="submit" name="delete" value="true" class="btn btn-danger mb-5">
+      <i class="fa-solid fa-trash-can me-2"></i>Delete
+    </button>
+    <button type="submit" name="download" value="true" class="btn btn-primary mb-5">
+      <i class="fa-solid fa-download me-2"></i>Download
+    </button>
+  </form>
+
+  <a th:href="@{/uaap-games}">Back to game list</a>
+
+</div>
+</body>
+</html>
