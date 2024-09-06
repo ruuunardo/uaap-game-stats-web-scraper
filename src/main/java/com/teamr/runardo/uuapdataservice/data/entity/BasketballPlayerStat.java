@@ -27,4 +27,13 @@ public class BasketballPlayerStat implements PlayerStat{
         @Column(name = "points")
         private Integer points;
 
+        @Override
+        public String toString() {
+                return "BasketballPlayerStat{" +
+                        "player=" + player +
+                        ", gameResult='" + gameResult + '\'' +
+                        ", isFirstFive=" + isFirstFive +
+                        ", points=" + points +
+                        '}';
+        }
 }

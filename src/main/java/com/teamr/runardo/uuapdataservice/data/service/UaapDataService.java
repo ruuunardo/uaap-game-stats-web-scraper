@@ -1,30 +1,18 @@
 package com.teamr.runardo.uuapdataservice.data.service;
 
-
-import com.teamr.runardo.uuapdataservice.data.dto.GameResultDto;
-import com.teamr.runardo.uuapdataservice.data.dto.UaapGameDto;
-import com.teamr.runardo.uuapdataservice.data.entity.BasketballPlayerStat;
-import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
-import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
-import com.teamr.runardo.uuapdataservice.data.repository.BasketballPlayerStatRepository;
-import com.teamr.runardo.uuapdataservice.data.repository.UaapGameRepository;
-import com.teamr.runardo.uuapdataservice.data.repository.UaapSeasonRepository;
-import com.teamr.runardo.uuapdataservice.data.entity.UaapSeason;
-import com.teamr.runardo.uuapdataservice.data.repository.VolleyballPlayerStatRepository;
-import com.teamr.runardo.uuapdataservice.filerepository.FileStorageRepository;
-import com.teamr.runardo.uuapdataservice.scraper.CsvGenerator;
-import com.teamr.runardo.uuapdataservice.scraper.UtilityClass;
+import com.teamr.runardo.uuapdataservice.data.entity.*;
+import com.teamr.runardo.uuapdataservice.data.repository.*;
+import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
+import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
+import com.teamr.runardo.uuapdataservice.scraper.gamescraper.ScraperManager;
+import com.teamr.runardo.uuapdataservice.scraper.gamescraper.UtilityClass;
+import com.teamr.runardo.uuapdataservice.scraper.statsfactory.CsvGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -32,23 +20,17 @@ import java.util.Optional;
 @Service
 public class UaapDataService {
     private UaapSeasonRepository uaapSeasonRepository;
-
     private UaapGameRepository uaapGameRepository;
-
-    private BasketballPlayerStatRepository basketballPlayerStatRepository;
-
-    private VolleyballPlayerStatRepository volleyballPlayerStatRepository;
-
-    private FileStorageRepository fileStorageRepository;
-
+    private PlayerStatRepository playerStatRepository;
+    private PlayerRepository playerRepository;
 
     @Autowired
-    public UaapDataService(UaapSeasonRepository uaapSeasonRepository, UaapGameRepository uaapGameRepository, BasketballPlayerStatRepository basketballPlayerStatRepository, VolleyballPlayerStatRepository volleyballPlayerStatRepository, FileStorageRepository fileStorageRepository) {
+    public UaapDataService(PlayerStatRepository playerStatRepository, UaapSeasonRepository uaapSeasonRepository, UaapGameRepository uaapGameRepository, PlayerRepository playerRepository) {
         this.uaapSeasonRepository = uaapSeasonRepository;
         this.uaapGameRepository = uaapGameRepository;
-        this.basketballPlayerStatRepository = basketballPlayerStatRepository;
-        this.volleyballPlayerStatRepository = volleyballPlayerStatRepository;
-        this.fileStorageRepository = fileStorageRepository;
+        this.playerRepository = playerRepository;
+        this.playerStatRepository = playerStatRepository;
+
     }
 
     public List<UaapSeason> findAllUaapSeason() {
@@ -72,28 +54,19 @@ public class UaapDataService {
             uaapGameRepository.deleteAllById(selections.get());
         }
     }
-
-    public ResponseEntity<Resource> getImageResource(String resource) {
-        String imgFile = resource.concat(".png");
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename = \"%s\"", imgFile))
-                .body(fileStorageRepository.findByName(imgFile));
-    }
-//    import CSV--------------------------------------------------
-
-    public void importCSV(InputStream inputStream) {
+//
+    public void uploadUaapSeason(List<UaapSeason> uaapSeasonList) {
         List<UaapSeason> allUaapSeason = uaapSeasonRepository.findAll();
         HashMap<String, Boolean> uaapSeasonCache = cacheAllUaapSeason(allUaapSeason);
 
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        bufferedReader.lines()
-                .skip(1)
-                .map(UaapSeason::parse)
-                .filter(us -> {
-                    return !(uaapSeasonCache.getOrDefault(getUaapSeasonCode(us), false));
+        uaapSeasonList.stream()
+                .filter(s -> {
+                    return !(uaapSeasonCache.getOrDefault(getUaapSeasonCode(s), false));
                 })
                 .map(this::checkUaapSeasonUrl)
-                .forEach(System.out::println);
+                .forEach(uaapSeason -> {
+                    uaapSeasonRepository.customSaveGame(uaapSeason);
+                });
     }
 
     private HashMap<String, Boolean> cacheAllUaapSeason(List<UaapSeason> allUaapSeason) {
@@ -109,8 +82,8 @@ public class UaapDataService {
     private String getUaapSeasonCode(UaapSeason g) {
         return String.join("-", g.getGameCode().getGameCode(), String.valueOf(g.getSeasonNumber()));
     }
-//    url check--------------------------------------------------
 
+//    url check----------------------------------------------------------
     public UaapSeason checkUaapSeasonUrl(UaapSeason game) {
         try {
             UtilityClass.getGameDocument(game.getUrl());
@@ -122,7 +95,6 @@ public class UaapDataService {
     }
 
 //    export CSV---------------------------------------------------------
-
     public void generateCSV(HttpServletResponse response, String id) throws IOException {
         UaapSeason season = findUaapSeasonById(Integer.parseInt(id));
         List<UaapGame> uaapGames = season.getUaapGames();
@@ -151,24 +123,60 @@ public class UaapDataService {
             csvGenerator.writeUaapGamesToCsv(uaapGameDtos, season, selections);
         }
     }
-
     private List<UaapGameDto> getUaapGameDtos(Optional<List<Integer>> selections, UaapSeason season) {
         List<UaapGame> uaapGames = uaapGameRepository.findAllById(selections.get());
         List<UaapGameDto> uaapGameDtos = uaapGames.stream()
                 .map(UaapGameDto::convertToDto)
                 .toList();
 
+        String gameCode = season.getGameCode().getGameCode();
+
         for (UaapGameDto g : uaapGameDtos) {
             for (GameResultDto gameResultDto : g.getGameResults()) {
                 Optional<List<PlayerStat>> playerStats = Optional.empty();
-                if(season.getGameCode().getGameCode().endsWith("BB")) {
-                    playerStats = basketballPlayerStatRepository.findAllByGameResult(gameResultDto.getId());
-                } else if (season.getGameCode().getGameCode().endsWith("VB")) {
-                    playerStats = volleyballPlayerStatRepository.findAllByGameResult(gameResultDto.getId());
-                }
+                playerStats = getPlayerStats(gameResultDto, gameCode);
                 playerStats.ifPresent(gameResultDto::setPlayerStats);
             }
         }
         return uaapGameDtos;
+    }
+
+    private Optional<List<PlayerStat>> getPlayerStats(GameResultDto gameResultDto, String gameCode) {
+        Optional<List<PlayerStat>> playerStats = Optional.empty();
+        playerStats = playerStatRepository.findAllByGameResult(gameResultDto.getId(), gameCode);
+        return playerStats;
+    }
+
+//    update Uaap Games---------------------------------------------------
+    public void updateUaapSeasonGames(int id) {
+        //get Uaap Season
+        Optional<UaapSeason> uaapSeason = uaapSeasonRepository.findById(id);
+        if (uaapSeason.isPresent()) {
+            ScraperManager scraperManager = new ScraperManager(UaapSeasonDto.convertToDto(uaapSeason.get()));
+            UaapSeasonDto uaapSeasonDto = scraperManager.getUaapSeasonDto();
+
+            List<Player> playerList = playerRepository.findAll();
+            for (UaapGameDto uaapGameDto : uaapSeasonDto.getUaapGames()) {
+                UaapGame uaapGame = UaapGameDto.convertToEntity(uaapGameDto);
+                uaapGameRepository.save(uaapGame);
+
+                for (GameResultDto gameResultDto : uaapGameDto.getGameResults()) {
+                    List<PlayerStat> playerStats = gameResultDto.getPlayerStats();
+                    savePlayerStat(playerStats, playerList, uaapSeasonDto.getGameCode().getGameCode());
+                }
+            }
+        }
+    }
+
+    private void savePlayerStat(List<PlayerStat> playerStats, List<Player> playerList, String gameCode) {
+        for (PlayerStat playerStat : playerStats) {
+//            }
+            playerStatRepository.save(playerStat);
+        }
+    }
+
+
+    public Optional<List<UaapGame>> findUaapGamesBySeasonId(int seasonNumber) {
+        return uaapGameRepository.findAllBySeasonId(seasonNumber);
     }
 }

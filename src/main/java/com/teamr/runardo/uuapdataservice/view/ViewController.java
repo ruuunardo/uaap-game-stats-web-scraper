@@ -1,14 +1,14 @@
 package com.teamr.runardo.uuapdataservice.view;
 
+import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGameCode;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapSeason;
 import com.teamr.runardo.uuapdataservice.data.service.UaapDataService;
-import com.teamr.runardo.uuapdataservice.filerepository.FileStorageRepository;
+import com.teamr.runardo.uuapdataservice.scraper.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,13 +25,14 @@ import java.util.Optional;
 @RequestMapping("uaap-games")
 public class ViewController {
     private UaapDataService uaapDataService;
-    private FileStorageRepository fileStorageRepository;
+    private FileService fileService;
 
     @Autowired
-    public ViewController(FileStorageRepository fileStorageRepository, UaapDataService uaapDataService) {
-        this.fileStorageRepository = fileStorageRepository;
+    public ViewController(UaapDataService uaapDataService, FileService fileService) {
         this.uaapDataService = uaapDataService;
+        this.fileService = fileService;
     }
+
 
     //Uaap season list
     @GetMapping()
@@ -45,6 +46,13 @@ public class ViewController {
     @GetMapping("/delete")
     public String deleteUaapSeasonGame(@RequestParam("gameSeasonId") int seasonId) {
         uaapDataService.deleteUaapSeasonById(seasonId);
+        return "redirect:/uaap-games";
+    }
+
+    //Update game Season
+    @GetMapping("/update")
+    public String updateUaapGameSeason(@RequestParam("gameSeasonId") int id, Model model) {
+        uaapDataService.updateUaapSeasonGames(id);
         return "redirect:/uaap-games";
     }
 
@@ -69,6 +77,8 @@ public class ViewController {
     @PostMapping("/save")
     public String saveUaapGame(@Valid @ModelAttribute("gameSeason") UaapSeason uaapSeason, Errors errors) {
         if (!errors.hasErrors()) {
+            Optional<List<UaapGame>> uaapGamesBySeasonId = uaapDataService.findUaapGamesBySeasonId(uaapSeason.getId());
+            uaapGamesBySeasonId.ifPresent(uaapSeason::setUaapGames);
             uaapDataService.addUaapSeason(uaapSeason);
             return "redirect:/uaap-games";
         }
@@ -77,12 +87,9 @@ public class ViewController {
 
     //save season from file
     @PostMapping(value = "/save-from-file")
-    public String saveUaapGames(@RequestParam MultipartFile csvFile) {
-        try {
-            uaapDataService.importCSV(csvFile.getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public String saveUaapGames(@RequestParam MultipartFile csvFile) throws IOException {
+        List<UaapSeason> uaapSeasonList = fileService.getUaapSeasonList(csvFile);
+        uaapDataService.uploadUaapSeason(uaapSeasonList);
         return "redirect:/uaap-games";
     }
 
@@ -96,24 +103,17 @@ public class ViewController {
     }
 
     //Delete games and result
-    @PostMapping(value = "/gamelist/{gameSeasonId}", params = "delete=true")
+    @GetMapping(value = "/gamelist/{gameSeasonId}", params = "delete=true")
     public String deleteGames(@PathVariable("gameSeasonId") int seasonId, @RequestParam("selections") Optional<List<Integer>> selections) {
         uaapDataService.deleteUaapGames(selections);
         String path = "redirect:gameSeasonId";
         return path.replace("gameSeasonId", String.valueOf(seasonId));
     }
 
-    //image source
-    @GetMapping("/images/{resource}")
-    public ResponseEntity<Resource> getResource(@PathVariable String resource) throws MalformedURLException {
-        return uaapDataService.getImageResource(resource);
-    }
-
-    private ResponseEntity<Resource> getImageResource(String resource) {
-        String imgFile = resource.concat(".png");
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename = \"%s\"", imgFile))
-                .body(fileStorageRepository.findByName(imgFile));
+    //export to csv (selected Uaap Games)
+    @GetMapping(value = "/gamelist/{gameSeasonId}", params = "download=true")
+    public void downloadGameList(@PathVariable("gameSeasonId") String id, @RequestParam("selections") Optional<List<Integer>> selections, HttpServletResponse response) throws IOException {
+        uaapDataService.generateCSV(response, id, selections);
     }
 
     //export to csv (ALL Uaap Games)
@@ -122,10 +122,15 @@ public class ViewController {
         uaapDataService.generateCSV(response, id);
     }
 
-    //export to csv (selected Uaap Games)
-    @PostMapping(value = "/gamelist/{gameSeasonId}", params = "download=true")
-    public void downloadGameList(@PathVariable("gameSeasonId") String id, @RequestParam("selections") Optional<List<Integer>> selections, HttpServletResponse response) throws IOException {
-        uaapDataService.generateCSV(response, id, selections);
+    //image resource
+    @GetMapping("/images/{resource}")
+    public ResponseEntity<Resource> getResource(@PathVariable String resource) throws MalformedURLException {
+        return fileService.getImageResource(resource);
     }
+
+
+
+
+
 
 }

@@ -26,4 +26,14 @@ public class VolleyballPlayerStat implements PlayerStat {
 
     @Column(name = "attack_made")
     private Integer attackMade;
+
+    @Override
+    public String toString() {
+        return "VolleyballPlayerStat{" +
+                "player=" + player +
+                ", gameResult='" + gameResult + '\'' +
+                ", attackAttempt=" + attackAttempt +
+                ", attackMade=" + attackMade +
+                '}';
+    }
 }

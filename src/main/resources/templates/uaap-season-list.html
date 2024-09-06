@@ -1,7 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+>
 <head>
     <style>
+        .navbar-brand > p {font-size: 12px;}
+        .navbar-brand {text-align: center}
+        div.navbar-brand {margin-right: 0}
+        a.navbar-brand {margin-right: 0}
+
         a {
             text-decoration: none;
         }
@@ -23,6 +30,7 @@
             display: flex;
             justify-context: space-between;
         }
+
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,26 +40,28 @@
 </head>
 <body>
 <div class="container">
-    <div class="mt-2" style="display: flex; justify-content: space-between;">
-        <div><h3>Uaap Games</h3></div>
-<!--        <div>-->
-<!--            <form action="'#'" th:action="@{/logout}" method="POST">-->
-<!--                <input type="submit" value="Logout" class="btn btn-sm btn-danger">-->
-<!--            </form>-->
-<!--        </div>-->
-    </div>
-    <hr>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/uaap-games}">
+                <img  th:src="@{/uaap-games/images/{filename}(filename=${'UAAP-LOGO'})}" height="45" width="100">
+            </a>
+            <div class="navbar-brand" th:href="@{/uaap-games}">
+                <h3>UAAP GAMES DATA</h3>
+                <p class="fst-italic">(Download game result per Season)</p>
+            </div>
+            <form class="d-flex" th:action="@{/logout}" method="POST" sec:authorize="isAuthenticated()">
+                <button class="btn btn-sm btn-outline-danger" type="submit"
+                        name="action" value="logout">Logout</button>
+            </form>
+            <form class="d-flex" th:action="@{/showLoginPage}" method="GET" sec:authorize="!isAuthenticated()">
+                <button class="btn btn-sm btn-outline-success" type="submit"
+                        name="action" value="login">Log as admin</button>
+            </form>
+        </div>
+    </nav>
 
-<!--    <div id="add-game" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">-->
-    <div id="add-game">
-        <a th:href="@{/uaap-games/show-form}" class="btn btn-primary btn-sm mb-3">
-            <i class="fa-solid fa-plus"></i>
-            <label>Add a game</label>
-        </a>
-    </div>
-
-    <table class="table table-bordered table-striped table-hover table-sm">
-        <thead class="table-dark">
+    <table class="table table-hover">
+        <thead class="thead-dark">
         <tr>
             <th scope="col">Season - Game</th>
             <th scope="col">Game Count</th>
@@ -78,24 +88,30 @@
                     <i class="fa-solid fa-arrows-rotate" th:styleappend="${isNotValid} ? 'color: #4a4a4a' : 'color: #0a8301'"></i>
                 </a>
                 <a th:href="@{uaap-games/delete(gameSeasonId=${game.id})}" class="btn btn-sm" data-toggle="tooltip"
-                   data-placement="top" title="delete">
+                   data-placement="top" title="delete" sec:authorize="hasRole('ADMIN')">
                     <i class="fa-solid fa-trash-can" style="color: #ff0000;"></i>
                 </a>
                 <a th:href="@{/uaap-games/edit(gameSeasonId=${game.id})}" class="btn btn-sm" data-toggle="tooltip"
-                   data-placement="top" title="edit">
+                   data-placement="top" title="edit" sec:authorize="hasRole('ADMIN')">
                     <i class="fa-solid fa-pen-to-square" style="color: #FFD43B;"></i>
                 </a>
                 <a th:href="@{/uaap-games/export-to-csv(gameSeasonId=${game.id})}" class="btn btn-sm"
                    data-toggle="tooltip" data-placement="top" title="download" th:classappend="${game.uaapGames.size()==0} ? 'disabled border border-0'">
-                    <i class="fa-solid fa-download" style="color: #000099;"></i>
+                    <i class="fa-solid fa-download" th:styleappend="${game.uaapGames.size()<=0} ? 'color: #4a4a4a' : 'color: #0a8301'"></i>
                 </a>
             </td>
         </tr>
         </tbody>
     </table>
 
-<!--    <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">-->
-    <div>
+    <div id="add-game" sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/uaap-games/show-form}" class="btn btn-primary btn-sm mb-3">
+            <i class="fa-solid fa-plus"></i>
+            <label>Add a game</label>
+        </a>
+    </div>
+
+    <div sec:authorize="hasRole('ADMIN')">
         <form action="'#'" th:action="@{/uaap-games/save-from-file}" method="post" enctype="multipart/form-data" >
             <div class="mb-3 mt-4" id="add-file">
                 <label for="csvFile" class="form-label">Add game file[Game Code, Game Name, Season Number, URL]</label>

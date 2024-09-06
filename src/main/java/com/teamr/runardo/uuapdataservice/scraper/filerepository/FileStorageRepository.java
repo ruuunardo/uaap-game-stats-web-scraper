@@ -1,4 +1,4 @@
-package com.teamr.runardo.uuapdataservice.filerepository;
+package com.teamr.runardo.uuapdataservice.scraper.filerepository;
 
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

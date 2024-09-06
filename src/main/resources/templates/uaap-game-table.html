@@ -1,7 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:color="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
   <style>
+    .header-caption > p    {font-size: 12px; margin-left: 10px;}
+    .navbar-brand > p {font-size: 12px;}
+    .navbar-brand {text-align: center}
+    div.navbar-brand {margin-right: 0}
+    a.navbar-brand {margin-right: 0}
+
     #score {
       font-weight: bold;
       width:80%;
@@ -60,12 +67,27 @@
 </head>
 <body>
 <div class="container">
-  <button th:onclick="location.href='http://localhost:8080/uaap-games'">
-    <h3 th:text="${'Season ' + uaapSeason.seasonNumber + ' - ' + uaapSeason.gameCode.gameName}"></h3>
-  </button>
+  <nav class="navbar bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" th:href="@{/uaap-games}">
+        <img  th:src="@{/uaap-games/images/{filename}(filename=${'UAAP-LOGO'})}" height="45" width="100">
+      </a>
+      <div class="navbar-brand" th:href="@{/uaap-games}">
+        <h3 th:text="${'UAAP Season' + uaapSeason.seasonNumber + ' ' + uaapSeason.gameCode.gameName}">UAAP DATA</h3>
+        <p class="fst-italic">(Download player stats per Game)</p>
+      </div>
+      <form class="d-flex" th:action="@{/logout}" method="POST" sec:authorize="isAuthenticated()">
+        <button class="btn btn-sm btn-outline-danger" type="submit"
+                name="action" value="logout">Logout</button>
+      </form>
+      <form class="d-flex" th:action="@{/showLoginPage}" method="GET" sec:authorize="!isAuthenticated()">
+        <button class="btn btn-sm btn-outline-success" type="submit"
+                name="action" value="login">Log as admin</button>
+      </form>
+    </div>
+  </nav>
 
-  <hr>
-  <form method="post">
+  <form method="GET">
     <div>
     <table class="table">
       <thead>
@@ -111,10 +133,10 @@
       </tbody>
     </table>
     </div>
-    <button type="submit" name="delete" value="true" class="btn btn-danger mb-5">
+    <button type="submit" name="delete" value="true" class="btn btn-sm btn-danger mb-3" sec:authorize="hasRole('ADMIN')">
       <i class="fa-solid fa-trash-can me-2"></i>Delete
     </button>
-    <button type="submit" name="download" value="true" class="btn btn-primary mb-5">
+    <button type="submit" name="download" value="true" class="btn btn-sm btn-primary mb-3">
       <i class="fa-solid fa-download me-2"></i>Download
     </button>
   </form>

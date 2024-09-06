@@ -1,7 +1,7 @@
-package com.teamr.runardo.uuapdataservice.scraper;
+package com.teamr.runardo.uuapdataservice.scraper.statsfactory;
 
-import com.teamr.runardo.uuapdataservice.data.dto.GameResultDto;
-import com.teamr.runardo.uuapdataservice.data.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
+import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
 import com.teamr.runardo.uuapdataservice.data.entity.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
