@@ -1,15 +1,13 @@
-package com.teamr.runardo.uuapdataservice.data.dto;
+package com.teamr.runardo.uuapdataservice.scraper.dto;
 
 import com.teamr.runardo.uuapdataservice.data.entity.GameResult;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -46,4 +44,36 @@ public class UaapGameDto {
 
         return uaapGameDto;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UaapGameDto that = (UaapGameDto) o;
+        return gameNumber == that.gameNumber && seasonId == that.seasonId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameNumber, seasonId);
+    }
+
+    public static UaapGame convertToEntity(UaapGameDto uaapGameDto) {
+        UaapGame build = UaapGame.builder()
+                .gameNumber(uaapGameDto.getGameNumber())
+                .id(uaapGameDto.getId())
+                .gameSched(uaapGameDto.getGameSched())
+                .venue(uaapGameDto.getVenue())
+                .seasonId(uaapGameDto.getSeasonId())
+                .build();
+
+        if (uaapGameDto.gameResults != null) {
+            List<GameResult> list = uaapGameDto.gameResults.stream()
+                    .map(GameResultDto::convertToEntity)
+                    .toList();
+            build.setGameResults(list);
+        }
+        return build;
+    }
+
 }

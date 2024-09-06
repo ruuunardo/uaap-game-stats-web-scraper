@@ -3,11 +3,11 @@ package com.teamr.runardo.uuapdataservice.data;
 import com.teamr.runardo.uuapdataservice.data.entity.*;
 import com.teamr.runardo.uuapdataservice.data.repository.*;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
@@ -33,11 +33,17 @@ class UaapDataApplicationTest {
     BasketballPlayerStatRepository basketballPlayerStatRepository;
 
     @Autowired
+    VolleyballPlayerStatRepository volleyballPlayerStatRepository;
+
+    @Autowired
+    PlayerStatRepository playerStatRepository;
+
+    @Autowired
     PlayerRepository playerRepository;
 
     private UaapSeason uaapSeason;
 
-    private BasketballPlayerStat basketballPlayerStat;
+    private PlayerStat basketballPlayerStat;
 
     @BeforeEach
     void setUpTest() {
@@ -144,19 +150,34 @@ class UaapDataApplicationTest {
 
     @Test
     void insertBBallStat() {
-        BasketballPlayerStat saved = basketballPlayerStatRepository.save(basketballPlayerStat);
-        assertEquals(basketballPlayerStat.getPoints(), saved.getPoints());
+        BasketballPlayerStat saved = (BasketballPlayerStat) playerStatRepository.save(basketballPlayerStat);
+//        BasketballPlayerStat saved = basketballPlayerStatRepository.save((BasketballPlayerStat) basketballPlayerStat);
+        assertEquals(((BasketballPlayerStat) basketballPlayerStat).getPoints(), saved.getPoints());
     }
 
     @Test
-    void findBBallStat() {
+    void addVballStat() {
         Player player = playerRepository.findById("T1").get();
         CompositeStatId statId = new CompositeStatId(player, "85-MBB-ADU-1");
-        Optional<BasketballPlayerStat> find = basketballPlayerStatRepository.findById(statId);
-        Optional<List<PlayerStat>> allByGameResult = basketballPlayerStatRepository.findAllByGameResult("85-MBB-ADU-1");
+
+        VolleyballPlayerStat volleyballPlayerStat = VolleyballPlayerStat.builder()
+                                            .gameResult("85-MBB-DLSU-2")
+                                            .attackAttempt(1)
+                                            .player(player)
+                                            .attackMade(2)
+                                            .build();
+
+        playerStatRepository.save(volleyballPlayerStat);
+//        Optional<BasketballPlayerStat> find = basketballPlayerStatRepository.findById(statId);
+        Optional<List<PlayerStat>> allByGameResult = playerStatRepository.findAllByGameResult("85-MBB-DLSU-2", "VB");
 
         System.out.println(allByGameResult);
-        assertTrue(allByGameResult.get().get(0).getClass() == BasketballPlayerStat.class);
+        assertTrue(allByGameResult.get().get(0).getClass() == VolleyballPlayerStat.class);
+
+    }
+
+    private JpaRepository getRepo() {
+        return basketballPlayerStatRepository;
     }
 
 //    @Test
