@@ -28,8 +28,8 @@ public class UaapSeason {
     @JoinColumn(name = "game_code")
     private UaapGameCode gameCode;
 
-    @JoinColumn(name = "is_url_working")
-    private boolean isUrlWorking;
+    @Column(name = "is_url_working")
+    private boolean urlWork;
 
     @OneToMany(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "season_id")
@@ -44,7 +44,7 @@ public class UaapSeason {
                 ", seasonNumber=" + seasonNumber +
                 ", url='" + url + '\'' +
                 ", gameCode=" + gameCode +
-                ", isUrlWorking=" + isUrlWorking +
+                ", isUrlWorking=" + urlWork +
                 ", uaapGames=" + (Objects.isNull(uaapGames) ? 0 : uaapGames.size()) +
                 '}';
     }
@@ -54,18 +54,19 @@ public class UaapSeason {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UaapSeason that = (UaapSeason) o;
-        return id == that.id && seasonNumber == that.seasonNumber && isUrlWorking == that.isUrlWorking && Objects.equals(url, that.url) && Objects.equals(gameCode, that.gameCode);
+        return id == that.id && seasonNumber == that.seasonNumber && urlWork == that.urlWork && Objects.equals(url, that.url) && Objects.equals(gameCode, that.gameCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, seasonNumber, url, gameCode, isUrlWorking, uaapGames);
+        return Objects.hash(id, seasonNumber, url, gameCode, urlWork, uaapGames);
     }
 
 
     public static UaapSeason parse(String csvLine) {
         String[] fields = csvLine.split(",\\s*");
         UaapGameCode uaapGameCode = new UaapGameCode(fields[0], fields[1]);
+        UaapSeason uaapSeason = new UaapSeason();
         return UaapSeason.builder()
                 .gameCode(uaapGameCode)
                 .seasonNumber(Integer.parseInt(fields[2]))

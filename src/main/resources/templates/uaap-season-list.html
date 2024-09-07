@@ -4,7 +4,7 @@
 >
 <head>
     <style>
-        .navbar-brand > p {font-size: 12px;}
+        .navbar-brand > p {font-size: 15px;}
         .navbar-brand {text-align: center}
         div.navbar-brand {margin-right: 0}
         a.navbar-brand {margin-right: 0}
@@ -40,10 +40,11 @@
 </head>
 <body>
 <div class="container">
+<!--    <p th:text="${@environment.getProperty('DB_USER')}"></p>-->
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" th:href="@{/uaap-games}">
-                <img  th:src="@{/uaap-games/images/{filename}(filename=${'UAAP-LOGO'})}" height="45" width="100">
+                <img  th:src="@{${@environment.getProperty('IMAGE_SOURCE')} + 'UAAP-LOGO.png'}" height="45" width="100">
             </a>
             <div class="navbar-brand" th:href="@{/uaap-games}">
                 <h3>UAAP GAMES DATA</h3>
@@ -73,7 +74,7 @@
         <tr th:if="${#lists.isEmpty(uaapSeasons)}">
             <td colspan="6" class="text-center">No Data</td>
         </tr>
-        <tr th:each="game: ${uaapSeasons}" th:with="isNotValid=${!game.isUrlWorking}">
+        <tr th:each="game: ${uaapSeasons}" th:with="isNotValid=${!game.urlWork}">
             <td><a th:href="@{/uaap-games/gamelist/{id}(id=${game.id})}"
                    th:text="${'Season ' + game.seasonNumber + ' - ' + game.gameCode.gameName}"></a></td>
             <td th:text="${game.uaapGames.size()}"></td>

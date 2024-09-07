@@ -37,7 +37,7 @@ public class UaapDataService {
         return uaapSeasonRepository.findAll();
     }
 
-    public void addUaapSeason(UaapSeason uaapSeason) {
+    public void mergeUaapSeason(UaapSeason uaapSeason) {
         uaapSeasonRepository.customSaveGame(uaapSeason);
     }
 
@@ -87,9 +87,9 @@ public class UaapDataService {
     public UaapSeason checkUaapSeasonUrl(UaapSeason game) {
         try {
             UtilityClass.getGameDocument(game.getUrl());
-            game.setUrlWorking(true);
+            game.setUrlWork(true);
         } catch (IOException e) {
-            game.setUrlWorking(false);
+            game.setUrlWork(false);
         }
         return game;
     }
@@ -148,33 +148,33 @@ public class UaapDataService {
     }
 
 //    update Uaap Games---------------------------------------------------
-    public void updateUaapSeasonGames(int id) {
+    public void uaapGames() {
+
+    }
+
+    public void updateUaapSeasonGamesById(int id) {
         //get Uaap Season
         Optional<UaapSeason> uaapSeason = uaapSeasonRepository.findById(id);
         if (uaapSeason.isPresent()) {
             ScraperManager scraperManager = new ScraperManager(UaapSeasonDto.convertToDto(uaapSeason.get()));
-            UaapSeasonDto uaapSeasonDto = scraperManager.getUaapSeasonDto();
+            UaapSeasonDto uaapSeasonDto = scraperManager.getUaapSeasonDtoToSave();
 
-            List<Player> playerList = playerRepository.findAll();
-            for (UaapGameDto uaapGameDto : uaapSeasonDto.getUaapGames()) {
-                UaapGame uaapGame = UaapGameDto.convertToEntity(uaapGameDto);
-                uaapGameRepository.save(uaapGame);
+            saveUaapGamesAndStats(uaapSeasonDto.getUaapGames());
+        }
+    }
 
-                for (GameResultDto gameResultDto : uaapGameDto.getGameResults()) {
-                    List<PlayerStat> playerStats = gameResultDto.getPlayerStats();
-                    savePlayerStat(playerStats, playerList, uaapSeasonDto.getGameCode().getGameCode());
+    public void saveUaapGamesAndStats(List<UaapGameDto> uaapGames) {
+        for (UaapGameDto uaapGameDto : uaapGames) {
+            UaapGame uaapGame = UaapGameDto.convertToEntity(uaapGameDto);
+            uaapGameRepository.save(uaapGame);  //saves UaapGame and GameResult
+
+            for (GameResultDto gameResultDto : uaapGameDto.getGameResults()) {
+                for (PlayerStat playerStat : gameResultDto.getPlayerStats()) {
+                    playerStatRepository.save(playerStat);  //saves Stats and Players
                 }
             }
         }
     }
-
-    private void savePlayerStat(List<PlayerStat> playerStats, List<Player> playerList, String gameCode) {
-        for (PlayerStat playerStat : playerStats) {
-//            }
-            playerStatRepository.save(playerStat);
-        }
-    }
-
 
     public Optional<List<UaapGame>> findUaapGamesBySeasonId(int seasonNumber) {
         return uaapGameRepository.findAllBySeasonId(seasonNumber);

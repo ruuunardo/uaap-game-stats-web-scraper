@@ -52,7 +52,7 @@ public class ViewController {
     //Update game Season
     @GetMapping("/update")
     public String updateUaapGameSeason(@RequestParam("gameSeasonId") int id, Model model) {
-        uaapDataService.updateUaapSeasonGames(id);
+        uaapDataService.updateUaapSeasonGamesById(id);
         return "redirect:/uaap-games";
     }
 
@@ -79,7 +79,7 @@ public class ViewController {
         if (!errors.hasErrors()) {
             Optional<List<UaapGame>> uaapGamesBySeasonId = uaapDataService.findUaapGamesBySeasonId(uaapSeason.getId());
             uaapGamesBySeasonId.ifPresent(uaapSeason::setUaapGames);
-            uaapDataService.addUaapSeason(uaapSeason);
+            uaapDataService.mergeUaapSeason(uaapSeason);
             return "redirect:/uaap-games";
         }
         return "uaap-games-form";
@@ -128,9 +128,14 @@ public class ViewController {
         return fileService.getImageResource(resource);
     }
 
+    //form (check url)
+    @GetMapping("/check-url")
+    public String checkUrl(@RequestParam("gameSeasonId") int id, Model model) {
+        //find game
+        UaapSeason uaapSeason = uaapDataService.findUaapSeasonById(id);
+        uaapDataService.checkUaapSeasonUrl(uaapSeason);
+        model.addAttribute("gameSeason", uaapSeason);
 
-
-
-
-
+        return "uaap-game-form";
+    }
 }

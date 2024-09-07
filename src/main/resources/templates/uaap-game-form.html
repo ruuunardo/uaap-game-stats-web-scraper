@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+>
+
 <head>
     <style>
     .header-caption > p    {font-size: 12px; margin-left: 10px;}
-    .navbar-brand > p {font-size: 12px;}
+    .navbar-brand > p {font-size: 15px;}
     .navbar-brand {text-align: center}
     div.navbar-brand {margin-right: 0}
     a.navbar-brand {margin-right: 0}
@@ -20,7 +23,7 @@
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" th:href="@{/uaap-games}">
-                <img  th:src="@{/uaap-games/images/{filename}(filename=${'UAAP-LOGO'})}" height="45" width="100">
+                <img  th:src="@{${@environment.getProperty('IMAGE_SOURCE')} + 'UAAP-LOGO.png'}" height="45" width="100">
             </a>
             <div class="navbar-brand" th:href="@{/uaap-games}">
                 <h3>UAAP GAMES FORM</h3>
@@ -43,7 +46,7 @@
 
     <form action="#" th:action="@{/uaap-games/save}" th:object="${gameSeason}" method="POST">
         <input type="hidden" th:field="*{id}">
-<!--        <input type="hidden" th:field="*{isUrlWorking}">-->
+        <input type="hidden" th:field="*{urlWork}">
         <div class="mb-4 w-25">
             <input type="text" th:field="*{gameCode.gameCode}" placeholder="Game Code"
                    class="form-control" th:errorclass="is-invalid">
@@ -67,13 +70,13 @@
         </div>
         <div class="mb-4 w-30">
             <input type="text" th:field="*{url}" placeholder="URL"
-                   class="form-control" th:errorclass="is-invalid" th:classappend="*{!isUrlWorking} ? 'is-invalid'">
+                   class="form-control" th:errorclass="is-invalid" th:classappend="*{!urlWork} ? 'is-invalid'">
 
             <div id="validationUrl" class="invalid-feedback" th:errors="*{url}">
                 Please choose a username.
             </div>
-            <div style="display:flex" th:if="*{!isUrlWorking} AND *{id} != 0">
-                <a th:href="@{/uaap-games/checkUrl(gameSeasonId=*{id})}" class="btn btn-sm" data-toggle="tooltip"
+            <div style="display:flex" th:if="*{!urlWork} AND *{id} != 0">
+                <a th:href="@{/uaap-games/check-url(gameSeasonId=*{id})}" class="btn btn-sm" data-toggle="tooltip"
                    data-placement="top" title="check url if working" style="color: #FF0000;">
                     <i class="fa-solid fa-circle-check fa-xl" style="color: #FF0000;"></i>
                     click to check url

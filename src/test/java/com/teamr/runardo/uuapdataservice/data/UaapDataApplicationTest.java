@@ -56,7 +56,7 @@ class UaapDataApplicationTest {
         uaapSeason = UaapSeason.builder()
                 .url("test.url")
                 .seasonNumber(99)
-                .isUrlWorking(true)
+                .urlWork(true)
                 .gameCode(gameCode)
                 .build();
 

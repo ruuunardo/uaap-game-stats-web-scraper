@@ -28,7 +28,8 @@ public class FileService {
 
 //        image resource----------------------------------------------------
     public ResponseEntity<Resource> getImageResource(String resource) {
-        String imgFile = resource.concat(".png");
+//        String imgFile = resource.concat(".png");
+        String imgFile = resource;
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename = \"%s\"", imgFile))
                 .body(findByName(imgFile));

@@ -4,7 +4,7 @@
 <head>
   <style>
     .header-caption > p    {font-size: 12px; margin-left: 10px;}
-    .navbar-brand > p {font-size: 12px;}
+    .navbar-brand > p {font-size: 15px;}
     .navbar-brand {text-align: center}
     div.navbar-brand {margin-right: 0}
     a.navbar-brand {margin-right: 0}
@@ -70,7 +70,8 @@
   <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand" th:href="@{/uaap-games}">
-        <img  th:src="@{/uaap-games/images/{filename}(filename=${'UAAP-LOGO'})}" height="45" width="100">
+<!--        <img  th:src="@{/uaap-games/images/{filename}(filename=${'UAAP-LOGO'})}" height="45" width="100">-->
+          <img  th:src="@{${@environment.getProperty('IMAGE_SOURCE')} + 'UAAP-LOGO.png'}" height="45" width="100">
       </a>
       <div class="navbar-brand" th:href="@{/uaap-games}">
         <h3 th:text="${'UAAP Season' + uaapSeason.seasonNumber + ' ' + uaapSeason.gameCode.gameName}">UAAP DATA</h3>
@@ -112,7 +113,8 @@
           <div th:with="isHomeLost=${homeTeam.finalScore < awayTeam.finalScore}" id="score">
 
             <div id = "home-team" class="team logo" th:classappend="${isHomeLost} ? 'team-losing'">
-              <img class="mx-2" th:src="@{/uaap-games/images/{filename}(filename = ${homeTeam.univ.univCode})}" height="32px" width="32px">
+<!--              <img class="mx-2" th:src="@{/uaap-games/images/{filename}(filename = ${homeTeam.univ.univCode})}" height="32px" width="32px">-->
+                <img  class="mx-2" th:src="@{${@environment.getProperty('IMAGE_SOURCE')} + ${homeTeam.univ.univCode} + '.png'}" height="32px" width="32px">
               <div th:text="${homeTeam.univ.univCode}"></div>
             </div>
 
@@ -124,7 +126,7 @@
 
             <div id = "away-team" class="team logo" th:classappend="${!isHomeLost} ? 'team-losing'">
                 <div th:text="${awayTeam.univ.univCode}"></div>
-              <img class="mx-2" th:src="@{/uaap-games/images/{filename}(filename = ${awayTeam.univ.univCode})}" height="32px" width="32px">
+                <img class="mx-2"  th:src="@{${@environment.getProperty('IMAGE_SOURCE')} + ${awayTeam.univ.univCode} + '.png'}" height="32px" width="32px">
             </div>
           </div>
         </td>
