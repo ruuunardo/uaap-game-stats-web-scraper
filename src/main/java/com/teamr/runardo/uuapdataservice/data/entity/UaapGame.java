@@ -31,12 +31,24 @@ public class UaapGame {
     @Column(name = "season_id")
     private int seasonId;
 
-    @OneToMany(cascade = CascadeType.ALL
+    @OneToMany(cascade = CascadeType.REMOVE
             , fetch = FetchType.LAZY
     )
     @JoinColumn(name="game_id")
     private List<GameResult> gameResults;
 
     public UaapGame() {
+    }
+
+    @Override
+    public String toString() {
+        return "UaapGame{" +
+                "id=" + id +
+                ", gameNumber=" + gameNumber +
+                ", gameSched=" + gameSched +
+                ", venue='" + venue + '\'' +
+                ", seasonId=" + seasonId +
+                ", gameResults=" + gameResults +
+                '}';
     }
 }

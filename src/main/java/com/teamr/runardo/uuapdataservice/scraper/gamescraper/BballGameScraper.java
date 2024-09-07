@@ -65,6 +65,7 @@ public class BballGameScraper extends GameScraper {
                 .setTeamTag(teamTag)
                 .setFinalScore(finalScore)
                 .setUniv(UaapTeam.uaapUnivFactory(uaapTeam))
+                .setId(scrapeGame, uaapSeasonDtofromDb)
                 .build();
         return build;
     }

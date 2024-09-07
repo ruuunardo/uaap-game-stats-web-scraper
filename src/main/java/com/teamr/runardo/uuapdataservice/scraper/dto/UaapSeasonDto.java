@@ -33,6 +33,7 @@ public class UaapSeasonDto {
         seasonDto.setSeasonNumber(uaapSeason.getSeasonNumber());
         seasonDto.setUrl(uaapSeason.getUrl());
         seasonDto.setUrlWorking(uaapSeason.isUrlWork());
+        seasonDto.setGameCode(uaapSeason.getGameCode());
 
         if (uaapSeason.getUaapGames() != null) {
             seasonDto.setUaapGames(uaapSeason.getUaapGames().stream()

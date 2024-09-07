@@ -72,13 +72,17 @@ public class GameResultDto {
         public GameResultDtoBuilder() {
         }
 
-        private GameResultDtoBuilder setId(int gameId, UaapUniv univ) {
-            this.id = id;
+        public GameResultDtoBuilder setId(UaapGameDto gameDto, UaapSeasonDto seasonDto) {
+            this.id = String.join("-",
+                    String.valueOf(seasonDto.getSeasonNumber()),
+                    seasonDto.getGameCode().getGameCode(),
+                    String.valueOf(gameDto.getGameNumber()),
+                    univ.getUnivCode());
             return this;
         }
 
-        public GameResultDtoBuilder setGameId(int gameId) {
-            this.gameId = gameId;
+        public GameResultDtoBuilder setGameId(int gameDto) {
+            this.gameId = gameDto;
             return this;
         }
 
@@ -107,7 +111,6 @@ public class GameResultDto {
             assert gameId != 0;
             assert univ != null;
 
-            setId(this.gameId, this.univ);
             return new GameResultDto(this);
         }
     }

@@ -84,7 +84,7 @@
                 </i>
             </td>
             <td>
-                <a th:href="@{uaap-games/show-form}" class="btn btn-sm" data-toggle="tooltip"
+                <a th:href="@{uaap-games/update(gameSeasonId=${game.id})}" class="btn btn-sm" data-toggle="tooltip"
                    data-placement="top" title="Update games" aria-disabled="true" th:classappend="${isNotValid} ? 'disabled border border-0'">
                     <i class="fa-solid fa-arrows-rotate" th:styleappend="${isNotValid} ? 'color: #4a4a4a' : 'color: #0a8301'"></i>
                 </a>

@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -50,12 +51,28 @@ public class UaapGameDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UaapGameDto that = (UaapGameDto) o;
-        return gameNumber == that.gameNumber && seasonId == that.seasonId;
+
+        int finalScoreThis = gameResults.stream().map(GameResultDto::getFinalScore).mapToInt(Integer::intValue).sum();
+        int finalScoreThat = that.gameResults.stream().map(GameResultDto::getFinalScore).mapToInt(Integer::intValue).sum();
+        return gameNumber == that.gameNumber && seasonId == that.seasonId & finalScoreThat == finalScoreThis;
+//        return gameNumber == that.gameNumber && seasonId == that.seasonId;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(gameNumber, seasonId);
+    }
+
+    @Override
+    public String toString() {
+        return "UaapGameDto{" +
+                "id=" + id +
+                ", gameNumber=" + gameNumber +
+                ", gameSched=" + gameSched +
+                ", venue='" + venue + '\'' +
+                ", seasonId=" + seasonId +
+                ", gameResults=" + gameResults +
+                '}';
     }
 
     public static UaapGame convertToEntity(UaapGameDto uaapGameDto) {

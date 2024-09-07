@@ -30,4 +30,15 @@ public class GameResult {
 
     @Column(name = "final_score")
     private int finalScore;
+
+    @Override
+    public String toString() {
+        return "GameResult{" +
+                "id='" + id + '\'' +
+                ", gameId=" + gameId +
+                ", univ=" + univ +
+                ", teamTag='" + teamTag + '\'' +
+                ", finalScore=" + finalScore +
+                '}';
+    }
 }
