@@ -108,7 +108,7 @@ public class GameResultDto {
 
         // Id created in build
         public GameResultDto build() {
-            assert gameId != 0;
+//            assert gameId != 0;
             assert univ != null;
 
             return new GameResultDto(this);

@@ -188,9 +188,9 @@ public class UaapDataService {
                     gameResult.setGameId(gameId);
                     gameResultRepository.save(gameResult);
 
-//                    for (PlayerStat playerStat : gameResultDto.getPlayerStats()) {
-//                        playerStatRepository.save(playerStat);  //saves Stats and Players
-//                    }
+                    for (PlayerStat playerStat : gameResultDto.getPlayerStats()) {
+                        playerStatRepository.save(playerStat);  //saves Stats and Players
+                    }
                 }
             }
         }

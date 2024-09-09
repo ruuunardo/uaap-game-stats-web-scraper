@@ -14,7 +14,7 @@ import lombok.*;
 public class BasketballPlayerStat implements PlayerStat{
         @Id
         @JoinColumn(name = "player_id")
-        @ManyToOne()
+        @ManyToOne(cascade = CascadeType.MERGE)
         private Player player;
 
         @Id

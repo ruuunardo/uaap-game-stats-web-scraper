@@ -1,5 +1,6 @@
 package com.teamr.runardo.uuapdataservice.scraper.gamescraper;
 
+import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
 import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
 import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
 import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
@@ -12,8 +13,10 @@ import org.jsoup.select.Elements;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 
 public class BballGameScraper extends GameScraper {
@@ -31,7 +34,7 @@ public class BballGameScraper extends GameScraper {
     }
 
     @Override
-    protected UaapGameDto extractScrapeGame(Element gameSched) {
+    protected UaapGameDto getScrapeGame(Element gameSched) {
         int gameNum = Integer.parseInt(gameSched.attr("href").split("/+")[4]);  //"match 1" get match number 1
 
         UaapGameDto uaapGameDto = new UaapGameDto();
@@ -41,7 +44,7 @@ public class BballGameScraper extends GameScraper {
     }
 
     @Override
-    protected void extractGameResultsToGame(Element gameSched, UaapGameDto game) {
+    protected void mapGameResultsToGame(Element gameSched, UaapGameDto game) {
         Elements schedTeams = gameSched.select(".scheduled-team");
 
         GameResultDto homeTeam = extractGameResult(game, schedTeams, "HOME");
@@ -49,7 +52,6 @@ public class BballGameScraper extends GameScraper {
 
         game.setGameResults(List.of(homeTeam, awayTeam));
     }
-
 
 
     private GameResultDto extractGameResult(UaapGameDto scrapeGame, Elements schedTeams, String teamTag) {
@@ -72,12 +74,18 @@ public class BballGameScraper extends GameScraper {
 
     @Override
     public void addAdditionalGameData(Document doc, UaapGameDto game) {
-        String text = doc.select("#location").text();
-        String[] textArray = text.split("(?<=\\D),\\s*");
-        LocalDateTime gameDateLDT = LocalDateTime.parse(textArray[1], DateTimeFormatter.ofPattern("LLLL dd, yyyy HH:mm"));
-        String venue = textArray[0];
+
+
+        Elements elements = doc.select("div#game-details div.game-detail span");
+        String venue = elements.get(1).text();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yy hh:mm a");
+        String textDate = elements.get(2).text();
+        LocalDateTime gameDateLDT = LocalDateTime.parse(textDate, formatter);
+
         game.setVenue(venue);
         game.setGameSched(gameDateLDT);
+
     }
 
     //------------------------ UTILITY METHOD ------------------------------//
@@ -94,22 +102,45 @@ public class BballGameScraper extends GameScraper {
             int index = 4;
             int webGameId = Integer.parseInt(split[index]);
 
-            UaapGameDto game = extractScrapeGame(gameSched);
-
-            webGameIdMap.put(game.getGameNumber(), webGameId);
+//            UaapGameDto game = getScrapeGame(gameSched);
+//            webGameIdMap.put(game.getGameNumber(), webGameId);
+            webGameIdMap.put(webGameId, webGameId); //same id
         }
         return  webGameIdMap;
     }
 
     //------------------------ FOR PLAYER STATS SCRAPER ------------------------------//
     @Override
-    protected Elements getTableElements(Document gameDocument) {
-        String cssQuery = "div#game-stats-container div.team-stats tbody";
-        return gameDocument.select(cssQuery);
+    protected Elements getTableBodyElements(Document gameDocument) {
+//        String cssQuery = "div#game-stats-container div.team-stats tbody";
+        String cssQuery = "div.boxscorewrap table.box-score tbody:has(.bsheader_type)";
+        Elements elements = gameDocument.select(cssQuery);
+        System.out.println("/");
+        return elements;
     }
 
     @Override
-    protected PlayerStatsFactory getFactory() {
+    protected List<PlayerStat> getPlayerStatList(List<String> playerStatCsvList, GameResultDto gameResultDto) {
+        boolean isFirstFive = "".equals(playerStatCsvList.get(6));
+        List<PlayerStat> playerStatList = new ArrayList<>();
+
+        for (int i = 1; i < playerStatCsvList.size(); ++i) {
+            String lineData = playerStatCsvList.get(i);
+            if ("".equals(lineData)) {
+                isFirstFive = !isFirstFive;
+                continue;
+            }
+            lineData = isFirstFive ? "*".concat(lineData) : lineData;
+
+            PlayerStatsFactory playerStatsFactory = getPlayerStatList();
+            Optional<PlayerStat> playerStat = playerStatsFactory.parse(uaapSeasonDtofromDb, gameResultDto, lineData);
+            playerStat.ifPresent(playerStatList::add);
+        }
+        return playerStatList;
+    }
+
+    @Override
+    protected PlayerStatsFactory getPlayerStatList() {
         return new BballPlayerStatFactory();
     }
 

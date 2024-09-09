@@ -4,6 +4,7 @@ import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -31,6 +32,7 @@ public class PlayerStatRepositoryImpl implements PlayerStatRepository {
         return Optional.ofNullable(query.getResultList());
     }
 
+    @Transactional
     @Override
     public PlayerStat save(PlayerStat playerStat) {
         return entityManager.merge(playerStat);

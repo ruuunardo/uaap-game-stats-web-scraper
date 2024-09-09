@@ -22,32 +22,33 @@ public class ScraperManager {
     }
 
     public UaapSeasonDto getUaapSeasonDtoToSave() {
-        UaapSeasonDto uaapSeasonDto = gameScraper.generateUaapSeasonDtoToSave();
+        UaapSeasonDto uaapSeasonDto = gameScraper.getUaapSeasonDtoToSave();
 
 //        //map of UaapGameDb gameNumber and server gameNumber
-//        HashMap<Integer, Integer> gameIdMap = gameScraper.extractGameNumGameIdMap();
+        HashMap<Integer, Integer> gameIdMap = gameScraper.extractGameNumGameIdMap();
 //
-//        Set<Integer> notFoundGames = new HashSet<>();
-//        for (UaapGameDto game : uaapSeasonDto.getUaapGames()) {
-//            Integer gameNumWeb = gameIdMap.get(game.getGameNumber());
-//            String urlStats = gameScraper.getUaapSeasonDtofromDb().getUrl().replace(":id",  String.valueOf(gameNumWeb));
-//            Document doc;
-//            try {
-//                doc = getDocumentStats(urlStats);
-//            } catch (IOException e) {
-//                notFoundGames.add(game.getGameNumber());
-//                continue;
-//            }
-//
-//            //add additional data
-//            gameScraper.addAdditionalGameData(doc, game);
-//
-//            //add player stats
-//            for (GameResultDto gameResult : game.getGameResults()) {
-//                List<PlayerStat> playerStats = gameScraper.scrapeStats(gameResult, doc);
-//                gameResult.setPlayerStats(playerStats);
-//            }
-//        }
+        Set<Integer> notFoundGames = new HashSet<>();
+        for (UaapGameDto game : uaapSeasonDto.getUaapGames()) {
+            Integer gameNumWeb = gameIdMap.get(game.getGameNumber());
+//            Integer gameNumWeb = game.getGameNumber();
+            String urlStats = gameScraper.getUaapSeasonDtofromDb().getUrl().replace(":id",  String.valueOf(gameNumWeb));
+            Document doc;
+            try {
+                doc = getDocumentStats(urlStats);
+            } catch (IOException e) {
+                notFoundGames.add(game.getGameNumber());
+                continue;
+            }
+
+//            add additional data
+            gameScraper.addAdditionalGameData(doc, game);
+
+            //add player stats
+            for (GameResultDto gameResult : game.getGameResults()) {
+                List<PlayerStat> playerStats = gameScraper.scrapePlayerStats(gameResult, doc);
+                gameResult.setPlayerStats(playerStats);
+            }
+        }
         return uaapSeasonDto;
     }
 

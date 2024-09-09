@@ -25,4 +25,13 @@ public class Player {
 
     public Player() {
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", univId=" + univId +
+                '}';
+    }
 }

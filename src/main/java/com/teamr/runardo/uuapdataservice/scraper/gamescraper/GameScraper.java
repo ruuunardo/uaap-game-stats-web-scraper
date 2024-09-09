@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -36,16 +35,17 @@ public abstract class GameScraper {
         }
     }
 
-    public UaapSeasonDto generateUaapSeasonDtoToSave() {
+    public UaapSeasonDto getUaapSeasonDtoToSave() {
 //     -get games from DB and Web
-        List<UaapGameDto> uaapGameDtosFromWeb = scrapeAllGames();
+        List<UaapGameDto> uaapGameDtosFromWeb = scrapeAllGamesAndResults();
         List<UaapGameDto> uaapGamesDb = uaapSeasonDtofromDb.getUaapGames();
 
-//        -generate uaapGames missing (Web - DB)
+//      -generate uaapGames missing (Web - DB)
         List<UaapGameDto> uaapGameDtosToAdd;
+        //compares season, game num and final results
         uaapGameDtosToAdd = uaapGameDtosFromWeb.stream().filter(g -> !uaapGamesDb.contains(g)).toList();
 
-//        -set UaapGamesSeasonToSave
+//       -set UaapGamesSeasonToSave
         return UaapSeasonDto.builder()
                 .url(uaapSeasonDtofromDb.getUrl())
                 .gameCode(uaapSeasonDtofromDb.getGameCode())
@@ -56,9 +56,9 @@ public abstract class GameScraper {
                 .build();
     }
 
-    public UaapSeasonDto generateUaapSeasonAllGames() {
+    public UaapSeasonDto getUaapSeasonAllGames() {
 //     -get games from DB and Web
-        List<UaapGameDto> uaapGameDtosFromWeb = scrapeAllGames();
+        List<UaapGameDto> uaapGameDtosFromWeb = scrapeAllGamesAndResults();
 
 //        -set UaapGamesSeasonToSave
         return UaapSeasonDto.builder()
@@ -73,7 +73,7 @@ public abstract class GameScraper {
 
 //------------------- SCRAPE ALL UAAP GAMES w/ Game Results (home and away) ----------------------//
     //ScrapeAllGames then assigned to uaapGameDtos
-    protected List<UaapGameDto> scrapeAllGames() {
+    protected List<UaapGameDto> scrapeAllGamesAndResults() {
         //Step1: get game schedule elements from Document for Uaap Game extraction
         Elements gameScheds = getGameSchedElements(document);
 
@@ -81,10 +81,10 @@ public abstract class GameScraper {
         List<UaapGameDto> games = new ArrayList<>();
         for (Element gameSched : gameScheds) {
             //Step2.1: Game details and uaap game
-            UaapGameDto scrapedGame = extractScrapeGame(gameSched);
+            UaapGameDto scrapedGame = getScrapeGame(gameSched);
 
             //Step2.2: extract game results and add to scrapedGame
-            extractGameResultsToGame(gameSched, scrapedGame);
+            mapGameResultsToGame(gameSched, scrapedGame);
 
             //add to game list
             games.add(scrapedGame);
@@ -98,18 +98,18 @@ public abstract class GameScraper {
     protected abstract Elements getGameSchedElements(Document gameDoc);
 
     //ScrapeAllGames: Step2.1
-    protected abstract UaapGameDto extractScrapeGame(Element gameSched);
+    protected abstract UaapGameDto getScrapeGame(Element gameSched);
 
     //ScrapeAllGames: Step2.2
-    protected abstract void extractGameResultsToGame(Element gameSched, UaapGameDto scrapeGame);
+    protected abstract void mapGameResultsToGame(Element gameSched, UaapGameDto scrapeGame);
 
 
 
 //    ------------------- SCRAPE STATS FOR EACH GAME ----------------------//
     //Scrape stats for each game
-    public List<PlayerStat> scrapeStats(GameResultDto gameResultDto, Document gameDocument){
+    public List<PlayerStat> scrapePlayerStats(GameResultDto gameResultDto, Document gameDocument){
         //Player stats table BODY elements (HOME, AWAY) - should be size 2
-        Elements playerStatTables = getTableElements(gameDocument);
+        Elements playerStatTables = getTableBodyElements(gameDocument);
 
         //--get table element if Home or Away (index0-> Home, index1-> Away)
         Element teamTableElement = "HOME".equals(gameResultDto.getTeamTag()) ? playerStatTables.get(0) : playerStatTables.get(1);
@@ -127,19 +127,14 @@ public abstract class GameScraper {
                 .toList();
 
         //extract player stats
-        List<PlayerStat> playerStatList = new ArrayList<>();
-        for(String lineData: playerStatCsvList){
-            PlayerStatsFactory playerStatsFactory = getFactory();
-            Optional<PlayerStat> playerStat = playerStatsFactory.parse(uaapSeasonDtofromDb, gameResultDto, lineData);
-            playerStat.ifPresent(playerStatList::add);
-        }
+        List<PlayerStat> playerStatList = getPlayerStatList(playerStatCsvList, gameResultDto);
 
         return playerStatList;
     }
 
-    protected abstract PlayerStatsFactory getFactory();
+    protected abstract List<PlayerStat> getPlayerStatList(List<String> playerStatCsvList, GameResultDto gameResultDto);
 
-    protected abstract Elements getTableElements(Document gameDocument);
+    protected abstract Elements getTableBodyElements(Document gameDocument);
 
     //------------------- Utility methods ----------------------//
 
@@ -158,4 +153,6 @@ public abstract class GameScraper {
         }
         throw new RuntimeException("Game Code error: " + gameCode);
     }
+
+    protected abstract PlayerStatsFactory getPlayerStatList();
 }
