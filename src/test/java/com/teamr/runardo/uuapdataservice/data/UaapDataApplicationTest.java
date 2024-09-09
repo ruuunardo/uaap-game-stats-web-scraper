@@ -75,8 +75,6 @@ class UaapDataApplicationTest {
     @Test
     void addUaapSeason() {
         UaapSeason savedGame = uaapSeasonRepository.customSaveGame(uaapSeason);
-        uaapSeason.setId(savedGame.getId());
-
         assertEquals(savedGame, uaapSeason);
     }
 
@@ -96,6 +94,23 @@ class UaapDataApplicationTest {
     }
 
     @Test
+    void deleteUaapGameBySeasonAndGameNum() {
+        UaapSeason savedGame = uaapSeasonRepository.customSaveGame(uaapSeason);
+
+        UaapGame uaapGame = uaapSeason.getUaapGames().get(0);
+        uaapGame.setSeasonId(savedGame.getId());
+
+        System.out.println(uaapGame);
+        uaapGameRepository.save(uaapGame);
+        System.out.println(uaapGame);
+
+        int i = uaapGameRepository.deleteByGameNumAndSeason(uaapGame.getGameNumber(), uaapGame.getSeasonId());
+        System.out.println("Delete game:" + i);
+        Optional<UaapGame> gameRetrieved = uaapGameRepository.findById(uaapGame.getId());
+        assertTrue(gameRetrieved.isEmpty());
+    }
+
+    @Test
     void addUaapGame() {
         UaapSeason savedGame = uaapSeasonRepository.customSaveGame(uaapSeason);
 
@@ -105,6 +120,9 @@ class UaapDataApplicationTest {
 
         UaapGame game = uaapGameRepository.save(uaapGame);
         int id = game.getId();
+
+        Optional<UaapGame> games = uaapGameRepository.findAllBySeasonIdAndGameNumber(game.getSeasonId(), game.getGameNumber());
+        System.out.println(games);
 
         assertFalse(uaapGameRepository.findById(id).isEmpty());
     }
@@ -151,7 +169,6 @@ class UaapDataApplicationTest {
     @Test
     void insertBBallStat() {
         BasketballPlayerStat saved = (BasketballPlayerStat) playerStatRepository.save(basketballPlayerStat);
-//        BasketballPlayerStat saved = basketballPlayerStatRepository.save((BasketballPlayerStat) basketballPlayerStat);
         assertEquals(((BasketballPlayerStat) basketballPlayerStat).getPoints(), saved.getPoints());
     }
 
@@ -168,25 +185,13 @@ class UaapDataApplicationTest {
                                             .build();
 
         playerStatRepository.save(volleyballPlayerStat);
-//        Optional<BasketballPlayerStat> find = basketballPlayerStatRepository.findById(statId);
         Optional<List<PlayerStat>> allByGameResult = playerStatRepository.findAllByGameResult("85-MBB-DLSU-2", "VB");
 
         System.out.println(allByGameResult);
         assertTrue(allByGameResult.get().get(0).getClass() == VolleyballPlayerStat.class);
 
+        int i = playerStatRepository.deleteAllByGameResultId("85-MBB-DLSU-2", "MVB");
+        assertEquals(1, i);
     }
 
-    private JpaRepository getRepo() {
-        return basketballPlayerStatRepository;
-    }
-
-//    @Test
-//    void instanceTest() {
-//        PlayerStat playerStat = new BasketballPlayerStat();
-//        PlayerStat playerStat2 = new VolleyballPlayerStat();
-//
-//        Class<? extends PlayerStat> aClass = playerStat.getClass();
-//
-//        System.out.println(playerStat2 instanceof BasketballPlayerStat);
-//    }
 }

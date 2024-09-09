@@ -10,4 +10,6 @@ public interface PlayerStatRepository {
     PlayerStat save(PlayerStat playerStat);
 
     Optional<List<PlayerStat>> findAllByGameResult(String gameId, String gameCode);
+
+    int deleteAllByGameResultId(String gameResultId, String gameCode);
 }

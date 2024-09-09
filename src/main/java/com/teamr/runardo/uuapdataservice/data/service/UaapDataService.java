@@ -9,7 +9,6 @@ import com.teamr.runardo.uuapdataservice.scraper.gamescraper.ScraperManager;
 import com.teamr.runardo.uuapdataservice.scraper.gamescraper.UtilityClass;
 import com.teamr.runardo.uuapdataservice.scraper.statsfactory.CsvGenerator;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -55,12 +54,24 @@ public class UaapDataService {
     }
 
     public void deleteUaapSeasonById(int seasonId) {
-        uaapSeasonRepository.deleteById(seasonId);
+        Optional<UaapSeason> season = uaapSeasonRepository.findById(seasonId);
+        UaapSeason uaapSeason = season.get();
+        if (uaapSeason.getUaapGames() != null) {
+            for (UaapGame g : uaapSeason.getUaapGames()) {
+                for (GameResult r : g.getGameResults()) {
+                    playerStatRepository.deleteAllByGameResultId(r.getId(), uaapSeason.getGameCode().getGameCode());
+                }
+            }
+        }
+
+        uaapSeasonRepository.delete(season.get());
     }
 
-    public void deleteUaapGames(Optional<List<Integer>> selections) {
+    public void deleteUaapGamesByIds(Optional<List<Integer>> selections, String gameCode) {
         if (selections.isPresent()) {
-            uaapGameRepository.deleteAllById(selections.get());
+            for (Integer i : selections.get()) {
+                deleteUaapGameByGameId(i, gameCode);
+            }
         }
     }
 //
@@ -165,21 +176,24 @@ public class UaapDataService {
         //get Uaap Season
         Optional<UaapSeason> uaapSeason = uaapSeasonRepository.findById(id);
         if (uaapSeason.isPresent()) {
+            //convert to dto
             UaapSeasonDto uaapSeasonDtoDb = UaapSeasonDto.convertToDto(uaapSeason.get());
+            //create scraper
             ScraperManager scraperManager = new ScraperManager(uaapSeasonDtoDb);
             UaapSeasonDto uaapSeasonDtoToUpdate = scraperManager.getUaapSeasonDtoToSave();
-
+            //game number in DB for not updated games
             HashSet<Integer> gameNumSet = new HashSet<>();
             uaapSeasonDtoDb.getUaapGames().stream().map(UaapGameDto::getGameNumber)
                     .forEach(gameNumSet::add
                     );
-            System.out.println(gameNumSet);
 
             for (UaapGameDto uaapGameDto : uaapSeasonDtoToUpdate.getUaapGames()) {
                 UaapGame uaapGame = UaapGameDto.convertToEntity(uaapGameDto);
+
                 if (gameNumSet.contains(uaapGame.getGameNumber())) {
-                    uaapGameRepository.delete(uaapGame);
                     System.out.println(uaapGame);
+                    deleteUaapGameByGameNumAndSeasonId(uaapGame.getGameNumber(),uaapGame.getSeasonId(), uaapSeasonDtoToUpdate.getGameCode().getGameCode());
+                    System.out.println("Game deleted" + uaapGame);
                 }
 
                 int gameId = uaapGameRepository.save(uaapGame).getId();//saves UaapGame and GameResult
@@ -187,6 +201,7 @@ public class UaapDataService {
                     GameResult gameResult = GameResultDto.convertToEntity(gameResultDto);
                     gameResult.setGameId(gameId);
                     gameResultRepository.save(gameResult);
+                    //delete player stats first
 
                     for (PlayerStat playerStat : gameResultDto.getPlayerStats()) {
                         playerStatRepository.save(playerStat);  //saves Stats and Players
@@ -196,22 +211,29 @@ public class UaapDataService {
         }
     }
 
-//    public void saveUaapGamesAndStats(List<UaapGameDto> uaapGames) {
-//        for (UaapGameDto uaapGameDto : uaapGames) {
-//            System.out.println(uaapGameDto);
-//            UaapGame uaapGame = UaapGameDto.convertToEntity(uaapGameDto);
-//            System.out.println(uaapGame);
-//            int gameId = uaapGameRepository.save(uaapGame).getId();//saves UaapGame and GameResult
-//
-//            for (GameResultDto gameResultDto : uaapGameDto.getGameResults()) {
-//                GameResult gameResult = GameResultDto.convertToEntity(gameResultDto);
-//                gameResult.setGameId(gameId);
-//                gameResultRepository.save(gameResult);
-////                for (PlayerStat playerStat : gameResultDto.getPlayerStats()) {
-////                    playerStatRepository.save(playerStat);  //saves Stats and Players
-////                }
-//            }
-//        }
+    private void deleteUaapGameByGameNumAndSeasonId(int gameNumber, int seasonId, String gameCode) {
+        //find Game
+        Optional<UaapGame> game = uaapGameRepository.findAllBySeasonIdAndGameNumber(seasonId, gameNumber);
+        game.ifPresent(uaapGame -> deleteUaapGame(gameCode, uaapGame));
+        deleteUaapGame(gameCode, game.get());
+    }
+
+    private void deleteUaapGameByGameId(int id, String gameCode) {
+        //find Game
+        Optional<UaapGame> game = uaapGameRepository.findById(id);
+        game.ifPresent(uaapGame -> deleteUaapGame(gameCode, uaapGame));
+        deleteUaapGame(gameCode, game.get());
+    }
+
+    private void deleteUaapGame(String gameCode, UaapGame uaapGame) {
+        for (GameResult gr : uaapGame.getGameResults()) {
+            String id = gr.getId();
+            //delete PlayerStats
+            playerStatRepository.deleteAllByGameResultId(id, gameCode);
+        }
+        //delete game and gameresult
+        uaapGameRepository.delete(uaapGame);
+    }
 
     public Optional<List<UaapGame>> findUaapGamesBySeasonId(int seasonNumber) {
         return uaapGameRepository.findAllBySeasonId(seasonNumber);

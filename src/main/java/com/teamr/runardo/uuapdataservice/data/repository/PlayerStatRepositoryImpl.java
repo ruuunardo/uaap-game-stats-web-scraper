@@ -3,6 +3,7 @@ package com.teamr.runardo.uuapdataservice.data.repository;
 import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class PlayerStatRepositoryImpl implements PlayerStatRepository {
     private EntityManager entityManager;
 
     @Override
-    public Optional<List<PlayerStat>> findAllByGameResult(String gameId, String gameCode) {
+    public Optional<List<PlayerStat>> findAllByGameResult(String gameResultId, String gameCode) {
         TypedQuery<PlayerStat> query = null;
         if (gameCode.endsWith("BB")) {
             query = entityManager.createQuery("select b from BasketballPlayerStat b where b.gameResult=:gameId", PlayerStat.class);
@@ -28,8 +29,24 @@ public class PlayerStatRepositoryImpl implements PlayerStatRepository {
         } else {
             throw new RuntimeException("Game code invalid: " + gameCode);
         }
-        query.setParameter("gameId", gameId);
+        query.setParameter("gameId", gameResultId);
         return Optional.ofNullable(query.getResultList());
+    }
+
+    @Transactional
+    @Override
+    public int deleteAllByGameResultId(String gameResultId, String gameCode) {
+        Query query;
+        if (gameCode.endsWith("VB")) {
+            query = entityManager.createQuery("delete from VolleyballPlayerStat s where s.gameResult=:gameId");
+        } else if (gameCode.endsWith("BB")) {
+            query = entityManager.createQuery("delete from BasketballPlayerStat b where b.gameResult=:gameId");
+        } else {
+            throw new RuntimeException("Game code invalid: " + gameCode);
+        }
+        query.setParameter("gameId", gameResultId);
+        int i = query.executeUpdate();
+        return i;
     }
 
     @Transactional

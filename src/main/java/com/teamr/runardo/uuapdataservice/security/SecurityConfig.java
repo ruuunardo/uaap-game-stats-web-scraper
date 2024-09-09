@@ -30,7 +30,7 @@ public class SecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(configurer
                         -> configurer
-                        .requestMatchers("/uaap-games", "/uaap-games/gamelist/**", "/uaap-games/images/**", "/uaap-games/export-to-csv").permitAll()
+                        .requestMatchers("/uaap-games", "/uaap-games/gamelist/**", "/uaap-games/images/**", "/uaap-games/update/**", "/uaap-games/export-to-csv").permitAll()
                         .requestMatchers("/uaap-games/delete/**", "/uaap-games/edit/**", "/uaap-games/show-form").hasRole("ADMIN")
                         .requestMatchers("/uaap-games/checkUrl/**").hasRole("ADMIN")
                         .anyRequest()

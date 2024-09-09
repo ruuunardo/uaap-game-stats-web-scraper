@@ -105,7 +105,8 @@ public class ViewController {
     //Delete games and result
     @GetMapping(value = "/gamelist/{gameSeasonId}", params = "delete=true")
     public String deleteGames(@PathVariable("gameSeasonId") int seasonId, @RequestParam("selections") Optional<List<Integer>> selections) {
-        uaapDataService.deleteUaapGames(selections);
+        UaapSeason season = uaapDataService.findUaapSeasonById(seasonId);
+        uaapDataService.deleteUaapGamesByIds(selections, season.getGameCode().getGameCode());
         String path = "redirect:gameSeasonId";
         return path.replace("gameSeasonId", String.valueOf(seasonId));
     }
