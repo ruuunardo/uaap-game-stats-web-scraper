@@ -3,6 +3,7 @@ package com.teamr.runardo.uuapdataservice.view;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGameCode;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapSeason;
+import com.teamr.runardo.uuapdataservice.data.service.ScraperService;
 import com.teamr.runardo.uuapdataservice.data.service.UaapDataService;
 import com.teamr.runardo.uuapdataservice.scraper.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,13 +27,14 @@ import java.util.Optional;
 public class ViewController {
     private UaapDataService uaapDataService;
     private FileService fileService;
+    private ScraperService scraperService;
 
     @Autowired
-    public ViewController(UaapDataService uaapDataService, FileService fileService) {
+    public ViewController(UaapDataService uaapDataService, FileService fileService, ScraperService scraperService) {
         this.uaapDataService = uaapDataService;
         this.fileService = fileService;
+        this.scraperService = scraperService;
     }
-
 
     //Uaap season list
     @GetMapping()
@@ -52,7 +54,7 @@ public class ViewController {
     //Update game Season
     @GetMapping("/update")
     public String updateUaapGameSeason(@RequestParam("gameSeasonId") int id, Model model) {
-        uaapDataService.updateUaapSeasonGamesById(id);
+        scraperService.updateUaapSeasonGamesById(id);
         return "redirect:/uaap-games";
     }
 
@@ -68,7 +70,7 @@ public class ViewController {
     //edit season
     @GetMapping("/edit")
     public String editUaapGame(@RequestParam("gameSeasonId") int id, Model model) {
-        UaapSeason uaapSeason = uaapDataService.findUaapSeasonById(id);
+        UaapSeason uaapSeason = uaapDataService.findUaapSeasonByIdSortedGames(id);
         model.addAttribute("gameSeason", uaapSeason);
         return "uaap-game-form";
     }
@@ -97,7 +99,7 @@ public class ViewController {
     //Games and result
     @GetMapping("/gamelist/{gameSeasonId}")
     public String getGames(@PathVariable("gameSeasonId") int seasonId, Model model) {
-        UaapSeason uaapSeason = uaapDataService.findUaapSeasonById(seasonId);
+        UaapSeason uaapSeason = uaapDataService.findUaapSeasonByIdSortedGames(seasonId);
         model.addAttribute("uaapSeason", uaapSeason);
         return "uaap-game-table";
     }
@@ -105,7 +107,7 @@ public class ViewController {
     //Delete games and result
     @GetMapping(value = "/gamelist/{gameSeasonId}", params = "delete=true")
     public String deleteGames(@PathVariable("gameSeasonId") int seasonId, @RequestParam("selections") Optional<List<Integer>> selections) {
-        UaapSeason season = uaapDataService.findUaapSeasonById(seasonId);
+        UaapSeason season = uaapDataService.findUaapSeasonByIdSortedGames(seasonId);
         uaapDataService.deleteUaapGamesByIds(selections, season.getGameCode().getGameCode());
         String path = "redirect:gameSeasonId";
         return path.replace("gameSeasonId", String.valueOf(seasonId));
@@ -133,7 +135,7 @@ public class ViewController {
     @GetMapping("/check-url")
     public String checkUrl(@RequestParam("gameSeasonId") int id, Model model) {
         //find game
-        UaapSeason uaapSeason = uaapDataService.findUaapSeasonById(id);
+        UaapSeason uaapSeason = uaapDataService.findUaapSeasonByIdSortedGames(id);
         uaapDataService.checkUaapSeasonUrl(uaapSeason);
         model.addAttribute("gameSeason", uaapSeason);
 
