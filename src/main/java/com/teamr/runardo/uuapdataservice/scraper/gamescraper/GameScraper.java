@@ -73,7 +73,7 @@ public abstract class GameScraper {
 
 //------------------- SCRAPE ALL UAAP GAMES w/ Game Results (home and away) ----------------------//
     //ScrapeAllGames then assigned to uaapGameDtos
-    protected List<UaapGameDto> scrapeAllGamesAndResults() {
+    public List<UaapGameDto> scrapeAllGamesAndResults() {
         //Step1: get game schedule elements from Document for Uaap Game extraction
         Elements gameScheds = getGameSchedElements(document);
 

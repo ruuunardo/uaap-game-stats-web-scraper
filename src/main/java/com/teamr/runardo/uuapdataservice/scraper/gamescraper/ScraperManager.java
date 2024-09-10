@@ -24,6 +24,9 @@ public class ScraperManager {
     public UaapSeasonDto getUaapSeasonDtoToSave() {
         UaapSeasonDto uaapSeasonDto = gameScraper.getUaapSeasonDtoToSave();
 
+        List<UaapGameDto> uaapGameDtosAll = gameScraper.scrapeAllGamesAndResults();
+
+
 //        //map of UaapGameDb gameNumber and server gameNumber
         HashMap<Integer, Integer> gameIdMap = gameScraper.extractGameNumGameIdMap();
 //
