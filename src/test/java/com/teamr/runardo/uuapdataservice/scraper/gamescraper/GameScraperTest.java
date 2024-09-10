@@ -2,8 +2,8 @@ package com.teamr.runardo.uuapdataservice.scraper.gamescraper;
 
 import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGameCode;
-import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
-import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
+import com.teamr.runardo.uuapdataservice.data.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.data.dto.UaapSeasonDto;
 import com.teamr.runardo.uuapdataservice.utility.UtilityClass;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;

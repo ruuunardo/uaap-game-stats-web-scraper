@@ -2,8 +2,8 @@ package com.teamr.runardo.uuapdataservice.data.service;
 
 import com.teamr.runardo.uuapdataservice.data.entity.*;
 import com.teamr.runardo.uuapdataservice.data.repository.*;
-import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
-import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.data.dto.GameResultDto;
+import com.teamr.runardo.uuapdataservice.data.dto.UaapGameDto;
 import com.teamr.runardo.uuapdataservice.utility.UtilityClass;
 import org.springframework.stereotype.Service;
 

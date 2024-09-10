@@ -3,7 +3,7 @@ package com.teamr.runardo.uuapdataservice.view;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGameCode;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapSeason;
-import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.data.dto.UaapGameDto;
 import com.teamr.runardo.uuapdataservice.scraper.service.ScraperService;
 import com.teamr.runardo.uuapdataservice.data.service.UaapDataService;
 import com.teamr.runardo.uuapdataservice.scraper.service.FileService;

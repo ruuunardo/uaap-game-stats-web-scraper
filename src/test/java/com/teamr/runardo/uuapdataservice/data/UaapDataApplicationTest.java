@@ -74,6 +74,7 @@ class UaapDataApplicationTest {
     @Test
     void addUaapSeason() {
         UaapSeason savedGame = uaapSeasonRepository.customSaveGame(uaapSeason);
+        uaapSeason.setId(savedGame.getId());
         assertEquals(savedGame, uaapSeason);
     }
 

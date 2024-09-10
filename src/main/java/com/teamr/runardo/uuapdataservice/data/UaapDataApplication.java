@@ -11,9 +11,9 @@ import java.util.Arrays;
 @SpringBootApplication
 public class UaapDataApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(UaapDataApplication.class, args);
-    }
+//    public static void main(String[] args) {
+//        SpringApplication.run(UaapDataApplication.class, args);
+//    }
 
 //    @Bean
 //    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {

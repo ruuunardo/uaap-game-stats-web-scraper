@@ -32,7 +32,7 @@ public class UaapGame {
     private int seasonId;
 
     @OneToMany(cascade = CascadeType.REMOVE
-            , fetch = FetchType.LAZY
+            , fetch = FetchType.EAGER
     )
     @JoinColumn(name="game_id")
     private List<GameResult> gameResults;

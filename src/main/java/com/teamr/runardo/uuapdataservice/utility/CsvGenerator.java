@@ -1,9 +1,9 @@
 package com.teamr.runardo.uuapdataservice.utility;
 
-import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
-import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.data.dto.GameResultDto;
+import com.teamr.runardo.uuapdataservice.data.dto.UaapGameDto;
 import com.teamr.runardo.uuapdataservice.data.entity.*;
-import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
+import com.teamr.runardo.uuapdataservice.data.dto.UaapSeasonDto;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -87,7 +87,26 @@ public class CsvGenerator {
             data.add(stat.getGameResult());
             data.add(stat.getPlayer().getId());
             data.add(stat.getPlayer().getName());
+            data.add(String.valueOf(stat.getMinPlayed()));
+            data.add(String.valueOf(stat.getFieldGoalAttempts()));
+            data.add(String.valueOf(stat.getFieldGoalMade()));
+            data.add(String.valueOf(stat.getTwoPointsAttempts()));
+            data.add(String.valueOf(stat.getTwoPointsMade()));
+            data.add(String.valueOf(stat.getThreePointsAttempts()));
+            data.add(String.valueOf(stat.getThreePointsMade()));
+            data.add(String.valueOf(stat.getFreeThrowAttempts()));
+            data.add(String.valueOf(stat.getFreeThrowMade()));
+            data.add(String.valueOf(stat.getReboundsOR()));
+            data.add(String.valueOf(stat.getReboundsDR()));
+            data.add(String.valueOf(stat.getAssist()));
+            data.add(String.valueOf(stat.getTurnOver()));
+            data.add(String.valueOf(stat.getSteal()));
+            data.add(String.valueOf(stat.getBlock()));
+            data.add(String.valueOf(stat.getFoulsPF()));
+            data.add(String.valueOf(stat.getFoulsFD()));
+            data.add(String.valueOf(stat.getEfficiency()));
             data.add(String.valueOf(stat.getPoints()));
+            data.add(String.valueOf(stat.getIsFirstFive()));
 
         } else if (gameCode.endsWith("VB")) {
             VolleyballPlayerStat stat = (VolleyballPlayerStat) playerStat;

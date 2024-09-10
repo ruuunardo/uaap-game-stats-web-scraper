@@ -1,12 +1,14 @@
 package com.teamr.runardo.uuapdataservice.scraper.statsfactory;
 
 
-import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
-import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
+import com.teamr.runardo.uuapdataservice.data.dto.GameResultDto;
+import com.teamr.runardo.uuapdataservice.data.dto.UaapSeasonDto;
 import com.teamr.runardo.uuapdataservice.data.entity.BasketballPlayerStat;
 import com.teamr.runardo.uuapdataservice.data.entity.Player;
 import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class BballPlayerStatFactory implements PlayerStatsFactory{
@@ -34,26 +36,26 @@ public class BballPlayerStatFactory implements PlayerStatsFactory{
         //create new player stat
         BasketballPlayerStat playerStat = BasketballPlayerStat.builder()
                 .player(extractedPlayer)
-//                .minPLayed(LocalTime.parse("0:".concat(splitStat[3]), DateTimeFormatter.ofPattern("H:m:s")))
+                .minPlayed(LocalTime.parse("0:".concat(splitStat[3]), DateTimeFormatter.ofPattern("H:m:s")))
                 .points(Integer.parseInt(splitStat[4]))
-//                .fieldGoalAttempts(Integer.parseInt(splitStat[5].split("-")[1]))
-//                .fieldGoalMade(Integer.parseInt(splitStat[5].split("-")[0]))
-//                .twoPointsAttempts(Integer.parseInt(splitStat[7].split("-")[1]))
-//                .twoPointsMade(Integer.parseInt(splitStat[7].split("-")[0]))
-//                .threePointsAttempts(Integer.parseInt(splitStat[9].split("-")[1]))
-//                .threePointsMade(Integer.parseInt(splitStat[9].split("-")[0]))
-//                .freeThrowAttempts(Integer.parseInt(splitStat[11].split("-")[1]))
-//                .freeThrowMade(Integer.parseInt(splitStat[11].split("-")[0]))
-//                .reboundsOR(Integer.parseInt(splitStat[13]))
-//                .reboundsDR(Integer.parseInt(splitStat[14]))
-//                .Assist(Integer.parseInt(splitStat[16]))
-//                .turnOver(Integer.parseInt(splitStat[17]))
-//                .steal(Integer.parseInt(splitStat[18]))
-//                .block(Integer.parseInt(splitStat[19]))
-//                .foulsPF(Integer.parseInt(splitStat[20]))
-//                .foulsFD(Integer.parseInt(splitStat[21]))
-//                .efficiency(Integer.parseInt(splitStat[22]))
-//                .isFirstFive(splitStat[0].startsWith("*") ? 1 : 0)
+                .fieldGoalAttempts(Integer.parseInt(splitStat[5].split("-")[1]))
+                .fieldGoalMade(Integer.parseInt(splitStat[5].split("-")[0]))
+                .twoPointsAttempts(Integer.parseInt(splitStat[7].split("-")[1]))
+                .twoPointsMade(Integer.parseInt(splitStat[7].split("-")[0]))
+                .threePointsAttempts(Integer.parseInt(splitStat[9].split("-")[1]))
+                .threePointsMade(Integer.parseInt(splitStat[9].split("-")[0]))
+                .freeThrowAttempts(Integer.parseInt(splitStat[11].split("-")[1]))
+                .freeThrowMade(Integer.parseInt(splitStat[11].split("-")[0]))
+                .reboundsOR(Integer.parseInt(splitStat[13]))
+                .reboundsDR(Integer.parseInt(splitStat[14]))
+                .assist(Integer.parseInt(splitStat[16]))
+                .turnOver(Integer.parseInt(splitStat[17]))
+                .steal(Integer.parseInt(splitStat[18]))
+                .block(Integer.parseInt(splitStat[19]))
+                .foulsPF(Integer.parseInt(splitStat[20]))
+                .foulsFD(Integer.parseInt(splitStat[21]))
+                .efficiency(Integer.parseInt(splitStat[22]))
+                .isFirstFive(splitStat[0].startsWith("*") ? 1 : 0)
                 .gameResult(gameResultDto.getId())
                 .build();
 

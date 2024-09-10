@@ -31,7 +31,7 @@ public class UaapSeason {
     @Column(name = "is_url_working")
     private boolean urlWork;
 
-    @OneToMany(cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "season_id")
     private List<UaapGame>  uaapGames;
 

@@ -1,4 +1,4 @@
-package com.teamr.runardo.uuapdataservice.scraper.dto;
+package com.teamr.runardo.uuapdataservice.data.dto;
 
 import com.teamr.runardo.uuapdataservice.data.entity.GameResult;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
@@ -8,7 +8,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Setter
 @Getter

@@ -1,4 +1,4 @@
-package com.teamr.runardo.uuapdataservice.scraper.dto;
+package com.teamr.runardo.uuapdataservice.data.dto;
 
 import com.teamr.runardo.uuapdataservice.data.entity.GameResult;
 import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
