@@ -1,6 +1,11 @@
 package com.teamr.runardo.uuapdataservice.scraper.service;
 
+import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapSeason;
+import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
+import com.teamr.runardo.uuapdataservice.utility.CsvGenerator;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -25,7 +30,6 @@ public class FileService {
 
 //        image resource----------------------------------------------------
     public ResponseEntity<Resource> getImageResource(String resource) {
-//        String imgFile = resource.concat(".png");
         String imgFile = resource;
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename = \"%s\"", imgFile))
@@ -52,5 +56,27 @@ public class FileService {
                 .toList();
     }
 
+    //        export CSV---------------------------------------------------------
+    public void generateCSV(HttpServletResponse response, UaapSeason season) throws IOException {
+        List<UaapGame> uaapGames = season.getUaapGames();
+        List<UaapGameDto> uaapGameDtos = uaapGames.stream()
+                .map(UaapGameDto::convertToDto)
+                .toList();
 
+        response.setContentType("text/csv");
+        String header = String.format("attachment; filename=\"uaap-games_%s-%s.csv\"", season.getGameCode().getGameCode(), season.getSeasonNumber());
+        response.addHeader("Content-Disposition", header);
+
+        CsvGenerator csvGenerator = new CsvGenerator(response.getWriter());
+        csvGenerator.writeUaapGamesToCsv(uaapGameDtos, UaapSeasonDto.convertToDto(season));
+    }
+
+    public void generateCSV(HttpServletResponse response, UaapSeason season, List<UaapGameDto> uaapGamesSelected) throws IOException {
+        response.setContentType("text/csv");
+        String header = String.format("attachment; filename=\"uaap-games_%s-%s_filtered.csv\"", season.getGameCode().getGameCode(), season.getSeasonNumber());
+        response.addHeader("Content-Disposition", header);
+
+        CsvGenerator csvGenerator = new CsvGenerator(response.getWriter());
+        csvGenerator.writeUaapGamesToCsv(uaapGamesSelected, UaapSeasonDto.convertToDto(season), "STATS");
+    }
 }

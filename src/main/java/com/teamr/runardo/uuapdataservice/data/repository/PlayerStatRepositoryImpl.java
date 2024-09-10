@@ -35,7 +35,7 @@ public class PlayerStatRepositoryImpl implements PlayerStatRepository {
 
     @Transactional
     @Override
-    public int deleteAllByGameResultId(String gameResultId, String gameCode) {
+    public int deleteAllStatsByGameResultId(String gameResultId, String gameCode) {
         Query query;
         if (gameCode.endsWith("VB")) {
             query = entityManager.createQuery("delete from VolleyballPlayerStat s where s.gameResult=:gameId");

@@ -11,5 +11,5 @@ public interface PlayerStatRepository {
 
     Optional<List<PlayerStat>> findAllByGameResult(String gameId, String gameCode);
 
-    int deleteAllByGameResultId(String gameResultId, String gameCode);
+    int deleteAllStatsByGameResultId(String gameResultId, String gameCode);
 }

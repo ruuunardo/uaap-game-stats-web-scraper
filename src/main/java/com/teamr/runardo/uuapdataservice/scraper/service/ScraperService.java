@@ -1,9 +1,10 @@
-package com.teamr.runardo.uuapdataservice.data.service;
+package com.teamr.runardo.uuapdataservice.scraper.service;
 
 import com.teamr.runardo.uuapdataservice.data.entity.GameResult;
 import com.teamr.runardo.uuapdataservice.data.entity.PlayerStat;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapSeason;
+import com.teamr.runardo.uuapdataservice.data.service.UaapDataService;
 import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
 import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
 import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
@@ -57,4 +58,6 @@ public class ScraperService {
             }
         }
     }
+
+
 }

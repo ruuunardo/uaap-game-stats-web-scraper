@@ -1,8 +1,9 @@
-package com.teamr.runardo.uuapdataservice.scraper.statsfactory;
+package com.teamr.runardo.uuapdataservice.utility;
 
 import com.teamr.runardo.uuapdataservice.scraper.dto.GameResultDto;
 import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
 import com.teamr.runardo.uuapdataservice.data.entity.*;
+import com.teamr.runardo.uuapdataservice.scraper.dto.UaapSeasonDto;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class CsvGenerator {
 
@@ -20,29 +20,40 @@ public class CsvGenerator {
         this.printer = new CSVPrinter(writer, CSVFormat.EXCEL);
     }
 
-    public void writeUaapGamesToCsv(List<UaapGameDto> uaapGames, UaapSeason uaapSeason) throws IOException {
+    public void writeUaapGamesToCsv(List<UaapGameDto> uaapGames, UaapSeasonDto uaapSeason) throws IOException {
         printer.printRecord(generateGameHeader());
-        for (UaapGameDto gr : uaapGames) {
-            generateGameData(gr, uaapSeason);
+        for (UaapGameDto game : uaapGames) {
+            int i = 0;
+            for (GameResultDto gameResult : game.getGameResults()) {
+                GameResultDto oppGameResult = i == 0 ? game.getGameResults().get(1) : game.getGameResults().get(0);
+                printer.printRecord(generateGameData(game, uaapSeason, oppGameResult, gameResult));
+                ++i;
+            }
         }
     }
 
 
     private List<String> generateGameHeader() {
-        return List.of("SEASON_NUM", "GAME_CODE", "GAME_NUM", "TEAM_TAG", "TEAM_NAME", "SCORE", "GAME_RESULT_ID", "OPPONENT", "OPPONENT_TEAM_SCORE");
+        return List.of("SEASON_NUM", "GAME_CODE", "GAME_NUM", "GAME_RESULT_ID", "TEAM_TAG", "TEAM_NAME", "SCORE", "OPPONENT", "OPPONENT_TEAM_SCORE");
     }
 
-    private void generateGameData(UaapGameDto game, UaapSeason uaapSeason) throws IOException {
-        int i = 0;
-        for (GameResultDto gameResult : game.getGameResults()) {
-            GameResultDto oppGameResult = i == 0 ? game.getGameResults().get(1) : game.getGameResults().get(0);
-            printer.printRecord(uaapSeason.getSeasonNumber(), uaapSeason.getGameCode().getGameCode(), game.getGameNumber(), gameResult.getTeamTag(), gameResult.getUniv().getUnivCode(), gameResult.getFinalScore(), gameResult.getId(), oppGameResult.getUniv().getUnivCode(), oppGameResult.getFinalScore());
-            ++i;
-        }
+    private List<String> generateGameData(UaapGameDto game, UaapSeasonDto uaapSeason, GameResultDto oppGameResult, GameResultDto gameResult) throws IOException {
+        List<String> data = new ArrayList<>();
+        data.add(String.valueOf(uaapSeason.getSeasonNumber()));
+        data.add(uaapSeason.getGameCode().getGameCode());
+        data.add(String.valueOf(game.getGameNumber()));
+        data.add(gameResult.getId());
+        data.add(gameResult.getTeamTag());
+        data.add(gameResult.getUniv().getUnivCode());
+        data.add(String.valueOf(gameResult.getFinalScore()));
+        data.add(oppGameResult.getUniv().getUnivCode());
+        data.add(String.valueOf(oppGameResult.getFinalScore()));
+
+        return data;
     }
 
 //    ---------------------------------------------------------------
-    public void writeUaapGamesToCsv(List<UaapGameDto> uaapGames, UaapSeason season, Optional<List<Integer>> selections) throws IOException {
+    public void writeUaapGamesToCsv(List<UaapGameDto> uaapGames, UaapSeasonDto season, String code) throws IOException {
         String gameCode = season.getGameCode().getGameCode();
         printer.printRecord(generateStatsHeader(gameCode));
         for (UaapGameDto g : uaapGames) {

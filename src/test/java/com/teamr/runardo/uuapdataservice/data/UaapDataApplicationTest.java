@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
@@ -190,7 +189,7 @@ class UaapDataApplicationTest {
         System.out.println(allByGameResult);
         assertTrue(allByGameResult.get().get(0).getClass() == VolleyballPlayerStat.class);
 
-        int i = playerStatRepository.deleteAllByGameResultId("85-MBB-DLSU-2", "MVB");
+        int i = playerStatRepository.deleteAllStatsByGameResultId("85-MBB-DLSU-2", "MVB");
         assertEquals(1, i);
     }
 

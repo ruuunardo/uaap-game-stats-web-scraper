@@ -3,7 +3,8 @@ package com.teamr.runardo.uuapdataservice.view;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGame;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapGameCode;
 import com.teamr.runardo.uuapdataservice.data.entity.UaapSeason;
-import com.teamr.runardo.uuapdataservice.data.service.ScraperService;
+import com.teamr.runardo.uuapdataservice.scraper.dto.UaapGameDto;
+import com.teamr.runardo.uuapdataservice.scraper.service.ScraperService;
 import com.teamr.runardo.uuapdataservice.data.service.UaapDataService;
 import com.teamr.runardo.uuapdataservice.scraper.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -116,13 +117,17 @@ public class ViewController {
     //export to csv (selected Uaap Games)
     @GetMapping(value = "/gamelist/{gameSeasonId}", params = "download=true")
     public void downloadGameList(@PathVariable("gameSeasonId") String id, @RequestParam("selections") Optional<List<Integer>> selections, HttpServletResponse response) throws IOException {
-        uaapDataService.generateCSV(response, id, selections);
+        UaapSeason uaapSeason = uaapDataService.findUaapSeasonByIdSortedGames(Integer.valueOf(id));
+        List<UaapGame> uaapGamesSelected = uaapDataService.findAllUaapGamesById(selections.get());
+        List<UaapGameDto> uaapGameDtos = uaapDataService.getUaapGameDtos(uaapGamesSelected, uaapSeason.getGameCode().getGameCode());
+        fileService.generateCSV(response, uaapSeason, uaapGameDtos);
+
     }
 
     //export to csv (ALL Uaap Games)
     @GetMapping("/export-to-csv")
     public void downloadUaapGame(HttpServletResponse response, @RequestParam("gameSeasonId") String id) throws IOException {
-        uaapDataService.generateCSV(response, id);
+        fileService.generateCSV(response, uaapDataService.findUaapSeasonByIdSortedGames(Integer.parseInt(id)));
     }
 
     //image resource

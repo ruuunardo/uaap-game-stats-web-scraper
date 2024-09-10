@@ -1,4 +1,4 @@
-package com.teamr.runardo.uuapdataservice.scraper.gamescraper;
+package com.teamr.runardo.uuapdataservice.utility;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
