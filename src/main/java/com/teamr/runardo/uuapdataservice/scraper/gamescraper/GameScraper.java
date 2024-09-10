@@ -35,42 +35,6 @@ public abstract class GameScraper {
         }
     }
 
-    public UaapSeasonDto getUaapSeasonDtoToSave() {
-//     -get games from DB and Web
-        List<UaapGameDto> uaapGameDtosFromWeb = scrapeAllGamesAndResults();
-        List<UaapGameDto> uaapGamesDb = uaapSeasonDtofromDb.getUaapGames();
-
-//      -generate uaapGames missing (Web - DB)
-        List<UaapGameDto> uaapGameDtosToAdd;
-        //compares season, game num and final results
-        uaapGameDtosToAdd = uaapGameDtosFromWeb.stream().filter(g -> !uaapGamesDb.contains(g)).toList();
-
-//       -set UaapGamesSeasonToSave
-        return UaapSeasonDto.builder()
-                .url(uaapSeasonDtofromDb.getUrl())
-                .gameCode(uaapSeasonDtofromDb.getGameCode())
-                .uaapGames(uaapGameDtosToAdd)
-                .seasonNumber(uaapSeasonDtofromDb.getSeasonNumber())
-                .isUrlWorking(uaapSeasonDtofromDb.isUrlWorking())
-                .id(uaapSeasonDtofromDb.getId())
-                .build();
-    }
-
-    public UaapSeasonDto getUaapSeasonAllGames() {
-//     -get games from DB and Web
-        List<UaapGameDto> uaapGameDtosFromWeb = scrapeAllGamesAndResults();
-
-//        -set UaapGamesSeasonToSave
-        return UaapSeasonDto.builder()
-                .url(uaapSeasonDtofromDb.getUrl())
-                .gameCode(uaapSeasonDtofromDb.getGameCode())
-                .uaapGames(uaapGameDtosFromWeb)
-                .seasonNumber(uaapSeasonDtofromDb.getSeasonNumber())
-                .isUrlWorking(uaapSeasonDtofromDb.isUrlWorking())
-                .id(uaapSeasonDtofromDb.getId())
-                .build();
-    }
-
 //------------------- SCRAPE ALL UAAP GAMES w/ Game Results (home and away) ----------------------//
     //ScrapeAllGames then assigned to uaapGameDtos
     public List<UaapGameDto> scrapeAllGamesAndResults() {

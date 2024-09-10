@@ -16,25 +16,29 @@ import java.util.Set;
 
 public class ScraperManager {
     private final GameScraper gameScraper;
+    private final UaapSeasonDto uaapSeasonDto;
 
     public ScraperManager(UaapSeasonDto uaapSeasonDto) {
+        this.uaapSeasonDto = uaapSeasonDto;
         gameScraper = GameScraper.gameScraperFactory(uaapSeasonDto);
     }
 
     public UaapSeasonDto getUaapSeasonDtoToSave() {
-        UaapSeasonDto uaapSeasonDto = gameScraper.getUaapSeasonDtoToSave();
+        List<UaapGameDto> uaapGameDtosFromWeb = gameScraper.scrapeAllGamesAndResults();
+        List<UaapGameDto> uaapGameDtosDb = uaapSeasonDto.getUaapGames();
 
-        List<UaapGameDto> uaapGameDtosAll = gameScraper.scrapeAllGamesAndResults();
+//      -generate uaapGames missing (Web - DB)
+        List<UaapGameDto> uaapGameDtosToAdd;
+        //compares season, game num and final results
+        uaapGameDtosToAdd = uaapGameDtosFromWeb.stream().filter(g -> !uaapGameDtosDb.contains(g)).toList();
 
-
-//        //map of UaapGameDb gameNumber and server gameNumber
+//      map of UaapGameDb gameNumber and server gameNumber
         HashMap<Integer, Integer> gameIdMap = gameScraper.extractGameNumGameIdMap();
 //
         Set<Integer> notFoundGames = new HashSet<>();
-        for (UaapGameDto game : uaapSeasonDto.getUaapGames()) {
+        for (UaapGameDto game : uaapGameDtosToAdd) {
             Integer gameNumWeb = gameIdMap.get(game.getGameNumber());
-//            Integer gameNumWeb = game.getGameNumber();
-            String urlStats = gameScraper.getUaapSeasonDtofromDb().getUrl().replace(":id",  String.valueOf(gameNumWeb));
+            String urlStats = uaapSeasonDto.getUrl().replace(":id",  String.valueOf(gameNumWeb));
             Document doc;
             try {
                 doc = getDocumentStats(urlStats);
@@ -52,7 +56,15 @@ public class ScraperManager {
                 gameResult.setPlayerStats(playerStats);
             }
         }
-        return uaapSeasonDto;
+
+        return UaapSeasonDto.builder()
+                .url(uaapSeasonDto.getUrl())
+                .gameCode(uaapSeasonDto.getGameCode())
+                .uaapGames(uaapGameDtosToAdd)
+                .seasonNumber(uaapSeasonDto.getSeasonNumber())
+                .isUrlWorking(uaapSeasonDto.isUrlWorking())
+                .id(uaapSeasonDto.getId())
+                .build();
     }
 
 
