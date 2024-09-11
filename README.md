@@ -1,5 +1,5 @@
 # UAAP Stats Scraper Using Jsoup
-A personal project for scraping UAAP stats and that can be downloaded in CSV format.
+A personal project for scraping UAAP stats that can be downloaded in CSV format.
 Data that are available to download: 
 - game results
 - individual player stats
