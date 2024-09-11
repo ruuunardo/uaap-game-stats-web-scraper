@@ -7,10 +7,10 @@ Data that are available to download:
 ## Frameworks and libraries used
 - Jsoup
 - Apache commons csv
-- Spring (data-jpa, thymeleaf)
+- Spring (Spring data jpa, Spring boot, thymeleaf)
 
 
 ### Live website
-[_CLICK HERE_](http://uaap-stats.ap-southeast-2.elasticbeanstalk.com/uaap-games)
+[_UAAP Stats_](http://uaap-stats.ap-southeast-2.elasticbeanstalk.com/uaap-games)
 
   
