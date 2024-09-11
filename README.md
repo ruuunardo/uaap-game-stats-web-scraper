@@ -8,6 +8,7 @@ Data that are available to download:
 - Jsoup
 - Apache commons csv
 - Spring (Spring data jpa, Spring boot, thymeleaf)
+- JUnit (for testing)
 
 
 ### Live website
