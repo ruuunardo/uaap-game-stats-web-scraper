@@ -1,0 +1,4 @@
+services:
+  network-deploy-service:
+    networks:
+      - uaapdata
