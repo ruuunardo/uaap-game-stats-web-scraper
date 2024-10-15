@@ -132,7 +132,7 @@ public class ViewController {
 
     //image resource
     @GetMapping("/images/{resource}")
-    public ResponseEntity<Resource> getResource(@PathVariable String resource) throws MalformedURLException {
+    public ResponseEntity<Resource> getResource(@PathVariable String resource) throws IOException {
         return fileService.getImageResource(resource);
     }
 

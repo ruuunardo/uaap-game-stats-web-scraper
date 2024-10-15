@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
+
 CREATE TABLE `uaap_game_codes` (
   `game_code` varchar(50) NOT NULL,
   `game_name` varchar(256) DEFAULT NULL,
@@ -27,6 +29,14 @@ CREATE TABLE `uaap_games` (
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ;
 
+CREATE TABLE `uaap_univ` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `univ_code` varchar(20) DEFAULT NULL,
+  `name_univ` varchar(256) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+;
+
 CREATE TABLE `uaap_game_results` (
   `id` varchar(20) NOT NULL,
   `game_id` int DEFAULT NULL,
@@ -42,13 +52,6 @@ CREATE TABLE `uaap_game_results` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ;
 
-CREATE TABLE `uaap_univ` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `univ_code` varchar(20) DEFAULT NULL,
-  `name_univ` varchar(256) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-;
 
 CREATE TABLE `uaap_players` (
   `id` varchar(20) NOT NULL,    -- based on season number, gamecode, team, player number (e.g. 87-MBB-UP-20)
@@ -105,3 +108,5 @@ CREATE TABLE `roles` (
   CONSTRAINT `fk_user` FOREIGN KEY (`username`) REFERENCES `users` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ;
+
+SET FOREIGN_KEY_CHECKS=1;

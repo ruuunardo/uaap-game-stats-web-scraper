@@ -7,8 +7,10 @@ import com.teamr.runardo.uuapdataservice.data.dto.UaapSeasonDto;
 import com.teamr.runardo.uuapdataservice.utility.CsvGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -25,19 +27,21 @@ import java.util.List;
 @Service
 @NoArgsConstructor
 public class FileService {
-    @Value("${STORAGE_FOLDER}")
-    private String storageFolder;
+    @Autowired
+    private ResourceLoader resourceLoader;
 
 //        image resource----------------------------------------------------
-    public ResponseEntity<Resource> getImageResource(String resource) {
+    public ResponseEntity<Resource> getImageResource(String resource) throws IOException {
         String imgFile = resource;
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename = \"%s\"", imgFile))
                 .body(findByName(imgFile));
     }
 
-    private Resource findByName(String filename) {
-        Path path = Path.of(storageFolder).resolve(filename).normalize();
+    private Resource findByName(String filename) throws IOException {
+//        Path path = Path.of(storageFolder).resolve(filename).normalize();
+        Resource resource = resourceLoader.getResource("classpath:images/" + filename);
+        Path path = resource.getFile().toPath();
         try {
             return new UrlResource(path.toUri());
         } catch (MalformedURLException e) {
