@@ -4,20 +4,11 @@ server:
 spring:
   application:
     name: "uaap-data-scraper"
-#  datasource:
-#    url: jdbc:h2:mem:uaap_data
-#    driverClassName: org.h2.Driver
-#    username: sa
-#    password: ''
-#  h2:
-#    console:
-#      enabled: true
   datasource:
     url: "jdbc:mysql://localhost:3306/test"
     username: springstudent
     password: springstudent
   jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: none
     show-sql: true
