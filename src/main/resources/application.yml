@@ -14,7 +14,7 @@ spring:
     show-sql: true
   sql:
     init:
-      mode: never      #for initialization of schema.sql
+      mode: always      #for initialization of schema.sql
   main:
     allow-bean-definition-overriding: true
 
