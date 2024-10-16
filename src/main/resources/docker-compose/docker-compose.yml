@@ -39,6 +39,6 @@ services:
       file: common-config.yml
       service: network-deploy-service
 
-  networks:
-    uaapdata:
-      driver: "bridge"
+networks:
+  uaapdata:
+    driver: "bridge"
