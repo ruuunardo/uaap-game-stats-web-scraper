@@ -15,7 +15,7 @@ Data that are available to download:
 [_UAAP Stats_](http://uaap-stats.ap-southeast-2.elasticbeanstalk.com/uaap-games)
 
 ### Dockerhub
-[_UAAP Stats_](https://hub.docker.com/r/runardo/uaap-data-scraper)
+[_runardo/uaap-data-scaper:v1_](https://hub.docker.com/r/runardo/uaap-data-scraper)
 
 
   
