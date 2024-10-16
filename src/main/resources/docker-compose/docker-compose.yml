@@ -27,6 +27,8 @@ services:
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "root"
       IMAGE_SOURCE: "localhost:8080/uaap-games/images/"
+    volumes:
+      - ../images:/uaapdatascraper/images
     depends_on:
       uaapdatadb:
         condition: service_healthy
