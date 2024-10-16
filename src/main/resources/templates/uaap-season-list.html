@@ -44,7 +44,7 @@
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" th:href="@{/uaap-games}">
-                <img  th:src="@{${@environment.getProperty('IMAGE_SOURCE')} + 'UAAP-LOGO.png'}" height="45" width="100">
+                <img  th:src="@{'/images/' + 'UAAP-LOGO.png'}" height="45" width="100">
             </a>
             <div class="navbar-brand" th:href="@{/uaap-games}">
                 <h3>UAAP GAMES DATA</h3>

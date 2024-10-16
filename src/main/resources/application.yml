@@ -17,11 +17,9 @@ spring:
       mode: never      #for initialization of schema.sql
   main:
     allow-bean-definition-overriding: true
-  environment:
-    IMAGE_SOURCE: "/images/"
 
-#image:
-#  source: "/images/"
+image:
+  source: "/images/"
 
 management:
   endpoints:
@@ -35,4 +33,6 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
+
+
 
